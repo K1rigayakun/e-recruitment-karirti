@@ -375,3 +375,33 @@ html[data-motion="reduced"] *::after {
 [data-nav].is-scrolled {
   border-bottom-color: var(--color-ink-line);
 }
+
+/* E16 Marquee skill */
+@keyframes marquee {
+  to { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  overflow: hidden;
+  width: 100%;
+}
+
+.marquee-inner {
+  display: flex;
+  width: max-content;
+  animation: marquee 40s linear infinite;
+}
+
+.marquee-track:hover .marquee-inner {
+  animation-play-state: paused;
+}
+
+html[data-motion="reduced"] .marquee-inner,
+@media (prefers-reduced-motion: reduce) {
+  .marquee-inner {
+    animation: none;
+    flex-wrap: wrap;
+    justify-content: center;
+    width: 100%;
+  }
+}

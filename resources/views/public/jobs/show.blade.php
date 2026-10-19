@@ -1,0 +1,169 @@
+@extends('layouts.app')
+
+@section('title', $job->title.' — '.$job->companyProfile->company_name)
+@section('meta-description', $job->summary ?? Str::limit(strip_tags($job->description), 155))
+
+@section('head-extra')
+{{-- Open Graph --}}
+<meta property="og:title" content="{{ $job->title }} — {{ $job->companyProfile->company_name }}">
+<meta property="og:description" content="{{ $job->summary ?? Str::limit(strip_tags($job->description), 155) }}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="{{ route('jobs.show', $job->slug) }}">
+<link rel="canonical" href="{{ route('jobs.show', $job->slug) }}">
+{{-- JSON-LD JobPosting --}}
+<script type="application/ld+json" nonce="{{ Vite::cspNonce() }}">
+@php
+    $jsonLd = [
+        "@context"         => "https://schema.org",
+        "@type"            => "JobPosting",
+        "title"            => $job->title,
+        "description"      => strip_tags($job->description),
+        "datePosted"       => $job->published_at?->toDateString(),
+        "validThrough"     => $job->deadline_at?->toDateString(),
+        "employmentType"   => $job->job_type->value,
+        "hiringOrganization" => [
+            "@type" => "Organization",
+            "name"  => $job->companyProfile->company_name,
+        ],
+        "jobLocation" => [
+            "@type"   => "Place",
+            "address" => ["@type" => "PostalAddress", "addressLocality" => $job->location, "addressCountry" => "ID"],
+        ],
+    ];
+@endphp{!! json_encode($jsonLd, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) !!}
+</script>
+@endsection
+
+@section('content')
+<div class="mx-auto max-w-4xl px-4 py-10">
+
+    {{-- Banner pratinjau --}}
+    @if ($isPreviewing)
+        <div class="mb-6 rounded-card border border-sun/40 bg-sun/10 px-4 py-3 text-sm text-sun">
+            Pratinjau — lowongan ini belum dipublikasikan dan tidak terlihat oleh pelamar.
+        </div>
+    @endif
+
+    {{-- Header --}}
+    <div class="mb-8 space-y-4" data-reveal="fade-up">
+        <div class="flex items-start gap-4">
+            @if ($job->companyProfile->logo_path)
+                <img src="{{ Storage::url($job->companyProfile->logo_path) }}"
+                    alt="Logo {{ $job->companyProfile->company_name }}"
+                    class="h-14 w-14 rounded-control object-contain bg-ink-raised border border-ink-line p-1">
+            @else
+                <div class="flex h-14 w-14 items-center justify-center rounded-control bg-ink-raised border border-ink-line font-display text-xl font-bold text-signal">
+                    {{ Str::upper(Str::substr($job->companyProfile->company_name, 0, 1)) }}
+                </div>
+            @endif
+            <div>
+                <h1 class="font-display text-3xl text-paper">{{ $job->title }}</h1>
+                <p class="mt-1 text-mist">
+                    <a href="#" class="hover:text-signal">{{ $job->companyProfile->company_name }}</a>
+                    · {{ $job->location }}
+                </p>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2">
+            <x-ui.badge tone="signal">{{ $job->job_type->label() }}</x-ui.badge>
+            <x-ui.badge tone="mist">{{ $job->work_mode->label() }}</x-ui.badge>
+            @foreach ($job->skills as $skill)
+                <x-ui.badge tone="violet">{{ $skill->name }}</x-ui.badge>
+            @endforeach
+        </div>
+
+        @if ($job->show_salary && $job->salary_min)
+            <p class="text-sm text-mist">
+                Gaji: <span class="text-paper">Rp {{ number_format($job->salary_min, 0, ',', '.') }}
+                @if ($job->salary_max) – Rp {{ number_format($job->salary_max, 0, ',', '.') }} @endif</span>
+            </p>
+        @endif
+        @if ($job->deadline_at)
+            <p class="text-sm text-mist">
+                Tenggat: <span class="text-paper">{{ $job->deadline_at->translatedFormat('d M Y') }}</span>
+                @if ($job->deadline_at->isPast()) <x-ui.badge tone="coral">Berakhir</x-ui.badge> @endif
+            </p>
+        @endif
+    </div>
+
+    <div class="grid gap-8 lg:grid-cols-[1fr_280px]">
+        {{-- Konten utama --}}
+        <div class="space-y-8">
+            <div data-reveal="fade-up">
+                <h2 class="mb-3 font-display text-xl text-paper">Deskripsi</h2>
+                <x-safe-markdown :text="$job->description" />
+            </div>
+            <div data-reveal="fade-up">
+                <h2 class="mb-3 font-display text-xl text-paper">Persyaratan</h2>
+                <x-safe-markdown :text="$job->requirements" />
+            </div>
+        </div>
+
+        {{-- Sidebar aksi --}}
+        <aside class="space-y-4">
+            <div class="rounded-card border border-ink-line bg-ink-raised p-5 space-y-3" data-reveal="scale-clip">
+                @auth
+                    @if (auth()->user()->role?->value === 'applicant')
+                        <x-ui.button variant="primary" class="w-full" disabled>
+                            Lamar sekarang
+                        </x-ui.button>
+                        <p class="text-xs text-mist text-center">Fitur melamar tersedia di Fase 8.</p>
+                    @else
+                        <p class="text-sm text-mist">Kamu login sebagai {{ auth()->user()->role?->label() }}.</p>
+                    @endif
+                @else
+                    <x-ui.button variant="primary" class="w-full" href="{{ route('login') }}">
+                        Masuk untuk melamar
+                    </x-ui.button>
+                    <p class="text-xs text-mist text-center">Belum punya akun? <a href="{{ route('register.applicant') }}" class="link-draw text-signal">Daftar</a></p>
+                @endauth
+
+                <button type="button" class="w-full text-sm text-mist hover:text-paper flex items-center justify-center gap-2"
+                    onclick="navigator.clipboard.writeText('{{ route('jobs.show', $job->slug) }}').then(()=>window.karirti?.showToast('Tautan disalin!','mint'))">
+                    <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                        <path d="M7 3.5A1.5 1.5 0 018.5 2h3.879a1.5 1.5 0 011.06.44l3.122 3.12A1.5 1.5 0 0117 6.622V12.5a1.5 1.5 0 01-1.5 1.5h-1v-3.379a3 3 0 00-.879-2.121L10.5 5.379A3 3 0 008.379 4.5H7v-1zm-2 0v1H4.5A1.5 1.5 0 003 6v10a1.5 1.5 0 001.5 1.5h7A1.5 1.5 0 0013 16v-.5h1.5A1.5 1.5 0 0016 14V6.622a1.5 1.5 0 00-.44-1.06L12.44 2.44A1.5 1.5 0 0011.378 2H8.5A1.5 1.5 0 007 3.5z"/>
+                    </svg>
+                    Salin tautan
+                </button>
+            </div>
+
+            {{-- Info perusahaan --}}
+            <div class="rounded-card border border-ink-line bg-ink-raised p-5 space-y-2" data-reveal="scale-clip">
+                <p class="font-semibold text-paper">{{ $job->companyProfile->company_name }}</p>
+                @if ($job->companyProfile->industry)
+                    <p class="text-xs text-mist">{{ $job->companyProfile->industry }}</p>
+                @endif
+                @if ($job->companyProfile->city)
+                    <p class="text-xs text-mist">{{ $job->companyProfile->city }}</p>
+                @endif
+                @if ($job->companyProfile->website)
+                    <a href="{{ $job->companyProfile->website }}" target="_blank" rel="noopener noreferrer"
+                       class="link-draw text-xs text-signal">Website →</a>
+                @endif
+            </div>
+        </aside>
+    </div>
+
+    {{-- Lowongan serupa (reveal stagger) --}}
+    @if ($similar->isNotEmpty())
+        <div class="mt-12">
+            <h2 class="mb-4 font-display text-2xl text-paper">Lowongan serupa</h2>
+            <div class="grid gap-4 sm:grid-cols-3" data-reveal="stagger">
+                @foreach ($similar as $s)
+                    <x-job-card
+                        :title="$s->title"
+                        :company="$s->companyProfile->company_name"
+                        :location="$s->location"
+                        :jobType="$s->job_type->label()"
+                        :workMode="$s->work_mode->label()"
+                        :href="route('jobs.show', $s->slug)"
+                        :tags="$s->skills->take(3)->pluck('name')->toArray()"
+                    />
+                @endforeach
+            </div>
+        </div>
+    @endif
+</div>
+@endsection
+

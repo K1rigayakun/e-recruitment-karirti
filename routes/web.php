@@ -11,10 +11,15 @@ use App\Http\Controllers\Auth\RegisteredApplicantController;
 use App\Http\Controllers\Auth\RegisteredCompanyController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Company\DashboardController as CompanyDashboard;
+use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\JobController;
 use Illuminate\Support\Facades\Route;
 
 // ── Halaman publik ────────────────────────────────────────────────────────────
-Route::get('/', fn () => view('welcome'))->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/lowongan', [JobController::class, 'index'])->name('jobs.index');
+Route::get('/lowongan/{slug}', [JobController::class, 'show'])->name('jobs.show');
+Route::get('/privasi', fn () => view('public.privacy'))->name('privacy');
 
 // ── Auth: tamu saja ───────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function (): void {
@@ -38,7 +43,6 @@ Route::middleware('guest')->group(function (): void {
 Route::middleware('auth')->group(function (): void {
     Route::post('/keluar', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
 
-    // Verifikasi email
     Route::get('/verifikasi-email', EmailVerificationPromptController::class)->name('verification.notice');
     Route::get('/verifikasi-email/{id}/{hash}', VerifyEmailController::class)
         ->middleware(['signed', 'throttle:6,1'])
@@ -50,24 +54,21 @@ Route::middleware('auth')->group(function (): void {
 
 // ── Dashboard pelamar ─────────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'active', 'role:applicant'])
-    ->prefix('/pelamar')
-    ->name('applicant.')
+    ->prefix('/pelamar')->name('applicant.')
     ->group(function (): void {
         Route::get('/', [ApplicantDashboard::class, 'index'])->name('dashboard');
     });
 
 // ── Dashboard perusahaan ──────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'active', 'role:company'])
-    ->prefix('/perusahaan')
-    ->name('company.')
+    ->prefix('/perusahaan')->name('company.')
     ->group(function (): void {
         Route::get('/', [CompanyDashboard::class, 'index'])->name('dashboard');
     });
 
 // ── Dashboard admin ───────────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'active', 'role:admin'])
-    ->prefix('/admin')
-    ->name('admin.')
+    ->prefix('/admin')->name('admin.')
     ->group(function (): void {
         Route::get('/', [AdminDashboard::class, 'index'])->name('dashboard');
     });
