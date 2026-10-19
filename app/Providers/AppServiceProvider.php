@@ -2,31 +2,36 @@
 
 namespace App\Providers;
 
+use App\Models\Document;
+use App\Models\PortfolioProject;
+use App\Policies\DocumentPolicy;
+use App\Policies\PortfolioProjectPolicy;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
 use Illuminate\Support\Facades\URL;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
-class AppServiceProvider extends ServiceProvider
+class AppServiceProvider extends AuthServiceProvider
 {
+    protected $policies = [
+        Document::class => DocumentPolicy::class,
+        PortfolioProject::class => PortfolioProjectPolicy::class,
+    ];
+
     public function register(): void {}
 
     public function boot(): void
     {
-        // Strict mode di non-production: cegah lazy loading, mass assignment diam-diam, dll
+        $this->registerPolicies();
+
         Model::shouldBeStrict(! app()->isProduction());
 
-        // Aturan password default (9.3)
         Password::defaults(function () {
             $rule = Password::min(10)->mixedCase()->numbers();
 
-            // uncompromised() butuh internet; hanya di production
-            return app()->isProduction()
-                ? $rule->uncompromised()
-                : $rule;
+            return app()->isProduction() ? $rule->uncompromised() : $rule;
         });
 
-        // Paksa HTTPS di production
         if (app()->isProduction()) {
             URL::forceScheme('https');
         }

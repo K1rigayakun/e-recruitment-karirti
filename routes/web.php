@@ -1,7 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Applicant\CvController;
 use App\Http\Controllers\Applicant\DashboardController as ApplicantDashboard;
+use App\Http\Controllers\Applicant\PortfolioController;
+use App\Http\Controllers\Applicant\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Auth\EmailVerificationNotificationController;
 use App\Http\Controllers\Auth\EmailVerificationPromptController;
@@ -11,8 +14,10 @@ use App\Http\Controllers\Auth\RegisteredApplicantController;
 use App\Http\Controllers\Auth\RegisteredCompanyController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Company\DashboardController as CompanyDashboard;
+use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\JobController;
+use App\Http\Controllers\Public\PortfolioController as PublicPortfolioController;
 use Illuminate\Support\Facades\Route;
 
 // ── Halaman publik ────────────────────────────────────────────────────────────
@@ -20,6 +25,7 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/lowongan', [JobController::class, 'index'])->name('jobs.index');
 Route::get('/lowongan/{slug}', [JobController::class, 'show'])->name('jobs.show');
 Route::get('/privasi', fn () => view('public.privacy'))->name('privacy');
+Route::get('/p/{slug}', [PublicPortfolioController::class, 'show'])->name('portfolios.show');
 
 // ── Auth: tamu saja ───────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function (): void {
@@ -50,13 +56,36 @@ Route::middleware('auth')->group(function (): void {
     Route::post('/verifikasi-email/kirim-ulang', [EmailVerificationNotificationController::class, 'store'])
         ->middleware('throttle:6,1')
         ->name('verification.send');
+
+    // Dokumen (CV) — akses lewat policy, disk private
+    Route::get('/dokumen/{document}', [DocumentController::class, 'show'])->name('documents.show');
 });
 
-// ── Dashboard pelamar ─────────────────────────────────────────────────────────
+// ── Dashboard & area pelamar ──────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'active', 'role:applicant'])
     ->prefix('/pelamar')->name('applicant.')
     ->group(function (): void {
         Route::get('/', [ApplicantDashboard::class, 'index'])->name('dashboard');
+
+        // Profil
+        Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
+
+        // CV
+        Route::get('/cv', [CvController::class, 'index'])->name('cv.index');
+        Route::post('/cv', [CvController::class, 'store'])->name('cv.store');
+        Route::patch('/cv/{document}/aktif', [CvController::class, 'setActive'])->name('cv.set-active');
+        Route::delete('/cv/{document}', [CvController::class, 'destroy'])->name('cv.destroy');
+
+        // Portofolio
+        Route::get('/proyek', [PortfolioController::class, 'index'])->name('projects.index');
+        Route::get('/proyek/tambah', [PortfolioController::class, 'create'])->name('projects.create');
+        Route::post('/proyek', [PortfolioController::class, 'store'])->name('projects.store');
+        Route::get('/proyek/{project}/edit', [PortfolioController::class, 'edit'])->name('projects.edit');
+        Route::put('/proyek/{project}', [PortfolioController::class, 'update'])->name('projects.update');
+        Route::delete('/proyek/{project}', [PortfolioController::class, 'destroy'])->name('projects.destroy');
+        Route::post('/proyek/{project}/naik', [PortfolioController::class, 'moveUp'])->name('projects.move-up');
+        Route::post('/proyek/{project}/turun', [PortfolioController::class, 'moveDown'])->name('projects.move-down');
     });
 
 // ── Dashboard perusahaan ──────────────────────────────────────────────────────

@@ -6,6 +6,7 @@ use Database\Factories\DocumentFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Document extends Model
 {
@@ -25,5 +26,11 @@ class Document extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /** Lamaran yang menggunakan dokumen ini (untuk cegah hapus CV yang terpakai). */
+    public function applications(): HasMany
+    {
+        return $this->hasMany(Application::class, 'cv_document_id');
     }
 }
