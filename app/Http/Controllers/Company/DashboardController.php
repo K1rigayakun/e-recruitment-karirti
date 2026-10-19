@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\Company;
 
+use App\Enums\ApplicationStatus;
+use App\Enums\JobStatus;
 use App\Http\Controllers\Controller;
+use App\Models\Application;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
@@ -10,11 +13,20 @@ class DashboardController extends Controller
 {
     public function index(Request $request): View
     {
-        $profile = $request->user()->companyProfile;
+        $user = $request->user();
+        $profile = $user->companyProfile;
 
-        return view('company.dashboard', [
-            'user' => $request->user(),
-            'profile' => $profile,
-        ]);
+        $stats = [];
+        if ($profile) {
+            $stats = [
+                'jobs_open' => $profile->jobPostings()->where('status', JobStatus::Open)->count(),
+                'applicants' => Application::forCompany($profile->id)->count(),
+                'pending' => Application::forCompany($profile->id)
+                    ->whereIn('status', [ApplicationStatus::Applied->value, ApplicationStatus::Viewed->value])
+                    ->count(),
+            ];
+        }
+
+        return view('company.dashboard', compact('user', 'profile', 'stats'));
     }
 }

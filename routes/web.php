@@ -14,6 +14,8 @@ use App\Http\Controllers\Auth\RegisteredApplicantController;
 use App\Http\Controllers\Auth\RegisteredCompanyController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Company\DashboardController as CompanyDashboard;
+use App\Http\Controllers\Company\JobController as CompanyJobController;
+use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\JobController;
@@ -57,27 +59,20 @@ Route::middleware('auth')->group(function (): void {
         ->middleware('throttle:6,1')
         ->name('verification.send');
 
-    // Dokumen (CV) — akses lewat policy, disk private
     Route::get('/dokumen/{document}', [DocumentController::class, 'show'])->name('documents.show');
 });
 
-// ── Dashboard & area pelamar ──────────────────────────────────────────────────
+// ── Area pelamar ──────────────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'active', 'role:applicant'])
     ->prefix('/pelamar')->name('applicant.')
     ->group(function (): void {
         Route::get('/', [ApplicantDashboard::class, 'index'])->name('dashboard');
-
-        // Profil
         Route::get('/profil', [ProfileController::class, 'edit'])->name('profile.edit');
         Route::put('/profil', [ProfileController::class, 'update'])->name('profile.update');
-
-        // CV
         Route::get('/cv', [CvController::class, 'index'])->name('cv.index');
         Route::post('/cv', [CvController::class, 'store'])->name('cv.store');
         Route::patch('/cv/{document}/aktif', [CvController::class, 'setActive'])->name('cv.set-active');
         Route::delete('/cv/{document}', [CvController::class, 'destroy'])->name('cv.destroy');
-
-        // Portofolio
         Route::get('/proyek', [PortfolioController::class, 'index'])->name('projects.index');
         Route::get('/proyek/tambah', [PortfolioController::class, 'create'])->name('projects.create');
         Route::post('/proyek', [PortfolioController::class, 'store'])->name('projects.store');
@@ -88,14 +83,24 @@ Route::middleware(['auth', 'verified', 'active', 'role:applicant'])
         Route::post('/proyek/{project}/turun', [PortfolioController::class, 'moveDown'])->name('projects.move-down');
     });
 
-// ── Dashboard perusahaan ──────────────────────────────────────────────────────
+// ── Area perusahaan ───────────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'active', 'role:company'])
     ->prefix('/perusahaan')->name('company.')
     ->group(function (): void {
         Route::get('/', [CompanyDashboard::class, 'index'])->name('dashboard');
+        Route::get('/profil', [CompanyProfileController::class, 'edit'])->name('profile.edit');
+        Route::put('/profil', [CompanyProfileController::class, 'update'])->name('profile.update');
+        Route::get('/lowongan', [CompanyJobController::class, 'index'])->name('jobs.index');
+        Route::get('/lowongan/buat', [CompanyJobController::class, 'create'])->name('jobs.create');
+        Route::post('/lowongan', [CompanyJobController::class, 'store'])->name('jobs.store');
+        Route::get('/lowongan/{job}/edit', [CompanyJobController::class, 'edit'])->name('jobs.edit');
+        Route::put('/lowongan/{job}', [CompanyJobController::class, 'update'])->name('jobs.update');
+        Route::delete('/lowongan/{job}', [CompanyJobController::class, 'destroy'])->name('jobs.destroy');
+        Route::post('/lowongan/{job}/publikasi', [CompanyJobController::class, 'publish'])->name('jobs.publish');
+        Route::post('/lowongan/{job}/tutup', [CompanyJobController::class, 'close'])->name('jobs.close');
     });
 
-// ── Dashboard admin ───────────────────────────────────────────────────────────
+// ── Area admin ────────────────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'active', 'role:admin'])
     ->prefix('/admin')->name('admin.')
     ->group(function (): void {

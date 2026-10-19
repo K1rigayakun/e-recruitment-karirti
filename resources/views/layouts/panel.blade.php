@@ -11,6 +11,11 @@
         ],
         "company" => [
             ["Ringkasan", route("company.dashboard")],
+            ["Profil",    route("company.profile.edit")],
+            ["Lowongan",  route("company.jobs.index")],
+            ["Pelamar",   "#"],
+            ["Laporan",   "#"],
+        ],
             ["Profil",    "#"],
             ["Lowongan",  "#"],
             ["Pelamar",   "#"],
@@ -109,3 +114,4 @@
     <x-ui.toast-region />
 </body>
 </html>
+

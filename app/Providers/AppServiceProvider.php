@@ -15,6 +15,7 @@ class AppServiceProvider extends AuthServiceProvider
 {
     protected $policies = [
         Document::class => DocumentPolicy::class,
+        JobPosting::class => JobPostingPolicy::class,
         PortfolioProject::class => PortfolioProjectPolicy::class,
     ];
 
