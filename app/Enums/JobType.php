@@ -1,0 +1,23 @@
+<?php
+
+namespace App\Enums;
+
+enum JobType: string
+{
+    case Internship = 'internship';
+    case FullTime = 'full_time';
+    case PartTime = 'part_time';
+    case Contract = 'contract';
+    case Freelance = 'freelance';
+
+    public function label(): string
+    {
+        return match ($this) {
+            self::Internship => 'Magang',
+            self::FullTime => 'Penuh waktu',
+            self::PartTime => 'Paruh waktu',
+            self::Contract => 'Kontrak',
+            self::Freelance => 'Freelance',
+        };
+    }
+}
