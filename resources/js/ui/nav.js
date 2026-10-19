@@ -1,5 +1,8 @@
+import { animate, stagger, utils } from "animejs";
+import { isReduced } from "../motion/prefs.js";
+import { dur, ease } from "../motion/tokens.js";
+
 export function initNav(root = document) {
-  const nav = root.querySelector("[data-nav]");
   const overlay = root.querySelector("[data-nav-overlay]");
   const panel = root.querySelector("[data-nav-panel]");
   const toggles = root.querySelectorAll("[data-nav-toggle]");
@@ -13,8 +16,14 @@ export function initNav(root = document) {
       btn.setAttribute("aria-label", open ? "Tutup menu" : "Buka menu");
     });
     if (open) {
-      const first = panel.querySelector("a, button");
+      const links = [...panel.querySelectorAll("a, button")].slice(0, 12);
+      const first = links[0];
       if (first instanceof HTMLElement) first.focus();
+      if (!isReduced()) {
+        utils.set(panel, { x: "12%" });
+        animate(panel, { x: "0%", duration: dur.base, ease: ease.out });
+        animate(links, { opacity: [0, 1], x: [12, 0], duration: dur.fast, delay: stagger(50), ease: ease.out });
+      }
     }
   };
 
@@ -50,16 +59,5 @@ export function initNav(root = document) {
         first.focus();
       }
     });
-  }
-
-  if (nav) {
-    const onScroll = () => {
-      const scrolled = window.scrollY > 40;
-      nav.classList.toggle("is-scrolled", scrolled);
-      nav.classList.toggle("glass", scrolled);
-      nav.classList.toggle("border-ink-line", scrolled);
-    };
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
   }
 }

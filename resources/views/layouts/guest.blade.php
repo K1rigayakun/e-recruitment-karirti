@@ -3,7 +3,8 @@
 <head>
     @include('layouts.partials.head')
 </head>
-<body class="min-h-dvh">
+<body class="min-h-dvh" data-ambient>
+    @include('layouts.partials.ambient')
     <a class="skip-link" href="#main">Lewati ke konten</a>
 
     <div class="grid min-h-dvh lg:grid-cols-2">
@@ -11,7 +12,7 @@
             <header>
                 <a href="{{ url('/') }}" class="font-display text-lg font-bold text-paper">{{ config('app.name') }}</a>
             </header>
-            <main id="main" class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10">
+            <main id="main" class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center py-10" data-page-enter>
                 @yield('content')
             </main>
             <footer class="text-sm text-mist">

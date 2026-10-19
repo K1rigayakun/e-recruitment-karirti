@@ -95,7 +95,7 @@
                 </nav>
             </div>
 
-            <main id="main" class="flex-1 px-4 py-6 lg:px-8">
+            <main id="main" class="flex-1 px-4 py-6 lg:px-8" data-page-enter>
                 @yield('content')
             </main>
             <footer class="border-t border-ink-line px-4 py-4 text-sm text-mist lg:px-8">

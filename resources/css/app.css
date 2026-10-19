@@ -305,6 +305,33 @@ html.js [data-reveal]:not([data-revealed]) {
   visibility: hidden;
 }
 
+html.js [data-page-enter]:not([data-entered]) {
+  opacity: 0;
+}
+
+[data-scroll-progress] {
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+[data-spotlight] {
+  background-image: radial-gradient(220px circle at var(--mx, 50%) var(--my, 0%), rgb(79 140 255 / 0.14), transparent 70%);
+}
+
+[data-pipeline-node] {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+[data-password-meter-bar] {
+  transform-origin: left;
+  transform: scaleX(0);
+}
+
+[data-toast-progress] {
+  transform-origin: left;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .skeleton::after,
   .btn-sheen::after {

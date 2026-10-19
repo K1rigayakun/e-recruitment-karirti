@@ -3,8 +3,12 @@
 <head>
     @include('layouts.partials.head')
 </head>
-<body class="min-h-dvh">
+<body class="min-h-dvh" @if (! empty($ambient)) data-ambient @endif>
+    <div class="pointer-events-none fixed top-0 left-0 z-[60] h-0.5 w-full bg-signal" data-scroll-progress></div>
     <a class="skip-link" href="#main">Lewati ke konten</a>
+    @if (! empty($ambient))
+        @include('layouts.partials.ambient')
+    @endif
 
     <header class="sticky top-0 z-40 border-b border-transparent" data-nav>
         <div class="mx-auto flex h-full max-w-6xl items-center justify-between gap-4 px-4">
@@ -54,7 +58,7 @@
         </nav>
     </div>
 
-    <main id="main">
+    <main id="main" data-page-enter>
         @yield('content')
     </main>
 

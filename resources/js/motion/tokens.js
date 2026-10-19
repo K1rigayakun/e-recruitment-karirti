@@ -1,19 +1,15 @@
-/**
- * Token motion KarirTI
- * Semua durasi dalam ms. Semua easing sesuai anime.js v4.
- */
-export const duration = {
-  fast: 200,
-  base: 360,
-  slow: 640,
-  hero: 1100,
-};
+import { spring } from "animejs";
+import { isReduced } from "./prefs.js";
+
+export { isReduced };
+
+export const dur = { fast: 200, base: 360, slow: 640, hero: 1100 };
 
 export const ease = {
-  enter: "outExpo",
-  leave: "inOutQuad",
-  spring: "spring(1, 80, 10, 0)",
+  out: "outExpo",
+  soft: "outQuart",
+  inOut: "inOutQuad",
+  spring: spring({ stiffness: 170, damping: 14 }),
 };
 
-export const staggerStep = 60; // ms antar elemen
-export const staggerMax  = 12; // maksimal elemen yang di-stagger
+export const gap = { tight: 40, base: 70, loose: 120 };
