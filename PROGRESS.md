@@ -10,7 +10,7 @@
 | 1 | Sistem Desain | ✅ SELESAI | 2026-10-19 |
 | 2 | Mesin Animasi & Background | ✅ SELESAI | 2026-10-19 |
 | 3 | Database & Seeder | ✅ SELESAI | 2026-10-19 |
-| 4 | Auth, Role, Keamanan Dasar | ⏳ Belum dimulai | - |
+| 4 | Auth, Role, Keamanan Dasar | ✅ SELESAI | 2026-10-19 |
 | 5–13 | ... | ⏳ Belum dimulai | - |
 
 ## Cara Menjalankan Proyek
@@ -67,5 +67,6 @@ Styleguide (hanya `APP_ENV=local`): http://127.0.0.1:8000/styleguide
 | anime.js | 4.5.0 |
 | Node.js | 22.14.0 |
 | MySQL/MariaDB | 10.4.32 |
+
 
 
