@@ -7,7 +7,7 @@
 | Fase | Nama | Status | Tanggal |
 |------|------|--------|---------|
 | 0 | Fondasi & Setup | ✅ SELESAI | 2026-10-19 |
-| 1 | Sistem Desain | ⏳ Belum dimulai | - |
+| 1 | Sistem Desain | ✅ SELESAI | 2026-10-19 |
 | 2 | Mesin Animasi & Background | ⏳ Belum dimulai | - |
 | 3 | Database & Seeder | ⏳ Belum dimulai | - |
 | 4 | Auth, Role, Keamanan Dasar | ⏳ Belum dimulai | - |
@@ -32,6 +32,8 @@ npm run build
 php artisan test
 ```
 
+Styleguide (hanya `APP_ENV=local`): http://127.0.0.1:8000/styleguide
+
 ## Keputusan Penting
 
 | Fase | Keputusan |
@@ -40,6 +42,10 @@ php artisan test
 | 0 | PHP 8.3.35 dari `M:\Xampp\php.exe` (bukan dari PATH default XAMPP) |
 | 0 | Vite tetap v8 (dari skeleton Laravel 13.37) — tidak di-downgrade |
 | 0 | Font self-host via `@fontsource-variable` |
+| 1 | `/styleguide` selalu terdaftar, 404 kecuali `app()->environment('local')` agar tes production mudah |
+| 1 | UI overlay (dialog/dropdown/nav/toast) memakai JS vanilla, tanpa Alpine |
+| 1 | Toast diposisikan kanan-bawah supaya tidak menutup hamburger di mobile |
+| 1 | Nonce CSP Vite diaktifkan di `AppServiceProvider` untuk skrip `no-js` → `js` |
 
 ## Utang Teknis
 
@@ -47,6 +53,8 @@ php artisan test
 |------|-----------|
 | Warning font runtime | Font woff2 tidak resolved saat build tapi berjalan normal di runtime |
 | PATH PHP | Harus set `$env:PATH = "M:\Xampp;$env:PATH"` setiap sesi baru |
+| HEAD detached | Repo masih detached dari tag skeleton Laravel; commit fase 1 dibuat di branch `main` lokal |
+| Esc di otomasi browser | Dialog native menutup lewat tombol Tutup; Escape browser-tool tidak selalu sampai ke `<dialog>` |
 
 ## Versi Stack
 

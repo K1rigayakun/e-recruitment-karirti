@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
@@ -16,5 +17,6 @@ class AppServiceProvider extends ServiceProvider
     {
         // Aktifkan strict mode: cegah lazy loading, mass assignment, dan silent discard
         Model::shouldBeStrict(! app()->isProduction());
+        Vite::useCspNonce();
     }
 }
