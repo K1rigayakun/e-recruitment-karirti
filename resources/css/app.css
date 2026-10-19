@@ -1,9 +1,49 @@
-@import 'tailwindcss';
-
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
+@import "tailwindcss";
+@import "@fontsource-variable/bricolage-grotesque";
+@import "@fontsource-variable/plus-jakarta-sans";
 
 @theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+  --color-ink: #0A1633;
+  --color-ink-raised: #12214A;
+  --color-ink-line: #223566;
+  --color-paper: #F3F6FF;
+  --color-mist: #8FA3CC;
+  --color-signal: #4F8CFF;
+  --color-sun: #FFC933;
+  --color-mint: #2EE6A6;
+  --color-violet: #A58BFF;
+  --color-coral: #FF6B81;
+
+  --font-display: "Bricolage Grotesque Variable", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Plus Jakarta Sans Variable", ui-sans-serif, system-ui, sans-serif;
+
+  --radius-chip: 999px;
+  --radius-control: 0.625rem;
+  --radius-card: 1.125rem;
+  --radius-sheet: 1.75rem;
+
+  --shadow-lift: 0 18px 40px -18px rgb(5 10 30 / 0.7);
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* Latar dasar: grid titik + spotlight (CSS murni) */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  background-image: radial-gradient(rgb(143 163 204 / .16) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(320px circle at var(--mx, 50%) var(--my, 30%), rgb(79 140 255 / .14), transparent 70%);
 }
