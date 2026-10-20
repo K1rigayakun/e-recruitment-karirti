@@ -21,3 +21,8 @@ window.addEventListener("karirti:motion-pref", () => {
 
 // Expose utilitas ke window agar blade/demo bisa memanggil
 window.karirti = { replayPipeline, showToast };
+
+// Chart.js dimuat dinamis hanya jika ada [data-chart] di halaman (E19)
+if (document.querySelector('[data-chart]')) {
+    import('./charts.js').then(({ initCharts }) => initCharts());
+}

@@ -1,6 +1,11 @@
 <?php
 
+use App\Http\Controllers\Admin\AuditLogController as AdminAuditLogController;
+use App\Http\Controllers\Admin\CompanyVerificationController;
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Admin\JobModerationController;
+use App\Http\Controllers\Admin\ReportController as AdminReportController;
+use App\Http\Controllers\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Applicant\ApplicationController;
 use App\Http\Controllers\Applicant\CvController;
 use App\Http\Controllers\Applicant\DashboardController as ApplicantDashboard;
@@ -21,6 +26,7 @@ use App\Http\Controllers\Company\DashboardController as CompanyDashboard;
 use App\Http\Controllers\Company\InterviewController as CompanyInterviewController;
 use App\Http\Controllers\Company\JobController as CompanyJobController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
+use App\Http\Controllers\Company\ReportController as CompanyReportController;
 use App\Http\Controllers\DocumentController;
 use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\JobController;
@@ -59,7 +65,7 @@ Route::middleware('auth')->group(function (): void {
     Route::get('/dokumen/{document}', [DocumentController::class, 'show'])->name('documents.show');
 });
 
-// ── Melamar (throttle 20x/menit) ─────────────────────────────────────────────
+// ── Melamar ───────────────────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'active', 'role:applicant', 'throttle:20,1'])
     ->post('/lowongan/{slug}/lamar', [ApplicationController::class, 'store'])
     ->name('applicant.applications.store');
@@ -95,7 +101,6 @@ Route::middleware(['auth', 'verified', 'active', 'role:applicant'])
         Route::get('/lamaran', [ApplicationController::class, 'index'])->name('applications.index');
         Route::get('/lamaran/{application}', [ApplicationController::class, 'show'])->name('applications.show');
         Route::post('/lamaran/{application}/batal', [ApplicationController::class, 'withdraw'])->name('applications.withdraw');
-        // Interview (sisi pelamar)
         Route::post('/interview/{interview}/konfirmasi', [ApplicantInterviewController::class, 'confirm'])->name('interviews.confirm');
         Route::post('/interview/{interview}/jadwal-ulang', [ApplicantInterviewController::class, 'requestReschedule'])->name('interviews.reschedule-request');
     });
@@ -119,11 +124,12 @@ Route::middleware(['auth', 'verified', 'active', 'role:company'])
         Route::get('/pelamar/{application}', [CompanyApplicantController::class, 'show'])->name('applicants.show');
         Route::post('/pelamar/{application}/keputusan', [CompanyApplicantController::class, 'decide'])->name('applicants.decide');
         Route::post('/pelamar/{application}/catatan', [CompanyApplicantController::class, 'note'])->name('applicants.note');
-        // Interview (sisi perusahaan)
         Route::get('/interview', [CompanyInterviewController::class, 'index'])->name('interviews.index');
         Route::post('/pelamar/{application}/interview', [CompanyInterviewController::class, 'store'])->name('interviews.store');
         Route::put('/interview/{interview}', [CompanyInterviewController::class, 'update'])->name('interviews.update');
         Route::delete('/interview/{interview}', [CompanyInterviewController::class, 'destroy'])->name('interviews.destroy');
+        Route::get('/laporan', [CompanyReportController::class, 'index'])->name('reports.index');
+        Route::get('/laporan/ekspor', [CompanyReportController::class, 'export'])->name('reports.export');
     });
 
 // ── Area admin ────────────────────────────────────────────────────────────────
@@ -131,6 +137,16 @@ Route::middleware(['auth', 'verified', 'active', 'role:admin'])
     ->prefix('/admin')->name('admin.')
     ->group(function (): void {
         Route::get('/', [AdminDashboard::class, 'index'])->name('dashboard');
+        Route::get('/pengguna', [AdminUserController::class, 'index'])->name('users.index');
+        Route::patch('/pengguna/{user}/aktif', [AdminUserController::class, 'toggleActive'])->name('users.toggle-active');
+        Route::get('/perusahaan', [CompanyVerificationController::class, 'index'])->name('companies.index');
+        Route::post('/perusahaan/{company}/setujui', [CompanyVerificationController::class, 'approve'])->name('companies.approve');
+        Route::post('/perusahaan/{company}/tolak', [CompanyVerificationController::class, 'reject'])->name('companies.reject');
+        Route::get('/lowongan', [JobModerationController::class, 'index'])->name('jobs.index');
+        Route::post('/lowongan/{job}/turunkan', [JobModerationController::class, 'takedown'])->name('jobs.takedown');
+        Route::get('/laporan', [AdminReportController::class, 'index'])->name('reports.index');
+        Route::get('/laporan/ekspor', [AdminReportController::class, 'export'])->name('reports.export');
+        Route::get('/log', [AdminAuditLogController::class, 'index'])->name('audit.index');
     });
 
 // ── Styleguide (hanya local) ──────────────────────────────────────────────────
