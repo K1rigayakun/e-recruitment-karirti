@@ -6,6 +6,12 @@
             ["Profil",     route("applicant.profile.edit")],
             ["CV",         route("applicant.cv.index")],
             ["Portofolio", route("applicant.projects.index")],
+            ["Lamaran",    route("applicant.applications.index")],
+            ["Notifikasi", route("notifications.index")],
+        ],
+            ["Profil",     route("applicant.profile.edit")],
+            ["CV",         route("applicant.cv.index")],
+            ["Portofolio", route("applicant.projects.index")],
             ["Lamaran",    "#"],
             ["Interview",  "#"],
         ],
@@ -114,4 +120,5 @@
     <x-ui.toast-region />
 </body>
 </html>
+
 

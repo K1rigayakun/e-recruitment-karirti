@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
+use App\Http\Controllers\Applicant\ApplicationController;
 use App\Http\Controllers\Applicant\CvController;
 use App\Http\Controllers\Applicant\DashboardController as ApplicantDashboard;
+use App\Http\Controllers\Applicant\NotificationController;
 use App\Http\Controllers\Applicant\PortfolioController;
 use App\Http\Controllers\Applicant\ProfileController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
@@ -33,16 +35,12 @@ Route::get('/p/{slug}', [PublicPortfolioController::class, 'show'])->name('portf
 Route::middleware('guest')->group(function (): void {
     Route::get('/masuk', [AuthenticatedSessionController::class, 'create'])->name('login');
     Route::post('/masuk', [AuthenticatedSessionController::class, 'store']);
-
     Route::get('/daftar/pelamar', [RegisteredApplicantController::class, 'create'])->name('register.applicant');
     Route::post('/daftar/pelamar', [RegisteredApplicantController::class, 'store']);
-
     Route::get('/daftar/perusahaan', [RegisteredCompanyController::class, 'create'])->name('register.company');
     Route::post('/daftar/perusahaan', [RegisteredCompanyController::class, 'store']);
-
     Route::get('/lupa-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
     Route::post('/lupa-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
-
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
     Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.store');
 });
@@ -50,17 +48,27 @@ Route::middleware('guest')->group(function (): void {
 // ── Auth: sudah login ─────────────────────────────────────────────────────────
 Route::middleware('auth')->group(function (): void {
     Route::post('/keluar', [AuthenticatedSessionController::class, 'destroy'])->name('logout');
-
     Route::get('/verifikasi-email', EmailVerificationPromptController::class)->name('verification.notice');
     Route::get('/verifikasi-email/{id}/{hash}', VerifyEmailController::class)
-        ->middleware(['signed', 'throttle:6,1'])
-        ->name('verification.verify');
+        ->middleware(['signed', 'throttle:6,1'])->name('verification.verify');
     Route::post('/verifikasi-email/kirim-ulang', [EmailVerificationNotificationController::class, 'store'])
-        ->middleware('throttle:6,1')
-        ->name('verification.send');
-
+        ->middleware('throttle:6,1')->name('verification.send');
     Route::get('/dokumen/{document}', [DocumentController::class, 'show'])->name('documents.show');
 });
+
+// ── Melamar (throttle 20x/menit) ─────────────────────────────────────────────
+Route::middleware(['auth', 'verified', 'active', 'role:applicant', 'throttle:20,1'])
+    ->post('/lowongan/{slug}/lamar', [ApplicationController::class, 'store'])
+    ->name('applicant.applications.store');
+
+// ── Notifikasi ────────────────────────────────────────────────────────────────
+Route::middleware(['auth', 'verified', 'active'])
+    ->prefix('/notifikasi')->name('notifications.')
+    ->group(function (): void {
+        Route::get('/', [NotificationController::class, 'index'])->name('index');
+        Route::post('/baca-semua', [NotificationController::class, 'markAllRead'])->name('read-all');
+        Route::post('/{id}/baca', [NotificationController::class, 'markRead'])->name('read');
+    });
 
 // ── Area pelamar ──────────────────────────────────────────────────────────────
 Route::middleware(['auth', 'verified', 'active', 'role:applicant'])
@@ -81,6 +89,10 @@ Route::middleware(['auth', 'verified', 'active', 'role:applicant'])
         Route::delete('/proyek/{project}', [PortfolioController::class, 'destroy'])->name('projects.destroy');
         Route::post('/proyek/{project}/naik', [PortfolioController::class, 'moveUp'])->name('projects.move-up');
         Route::post('/proyek/{project}/turun', [PortfolioController::class, 'moveDown'])->name('projects.move-down');
+        // Lamaran
+        Route::get('/lamaran', [ApplicationController::class, 'index'])->name('applications.index');
+        Route::get('/lamaran/{application}', [ApplicationController::class, 'show'])->name('applications.show');
+        Route::post('/lamaran/{application}/batal', [ApplicationController::class, 'withdraw'])->name('applications.withdraw');
     });
 
 // ── Area perusahaan ───────────────────────────────────────────────────────────

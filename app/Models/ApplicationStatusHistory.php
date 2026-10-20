@@ -16,6 +16,7 @@ class ApplicationStatusHistory extends Model
         'to_status',
         'note',
         'changed_by',
+        'created_at',
     ];
 
     protected function casts(): array

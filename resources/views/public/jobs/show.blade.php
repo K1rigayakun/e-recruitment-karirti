@@ -104,13 +104,28 @@
         <aside class="space-y-4">
             <div class="rounded-card border border-ink-line bg-ink-raised p-5 space-y-3" data-reveal="scale-clip">
                 @auth
-                    @if (auth()->user()->role?->value === 'applicant')
-                        <x-ui.button variant="primary" class="w-full" disabled>
-                            Lamar sekarang
-                        </x-ui.button>
-                        <p class="text-xs text-mist text-center">Fitur melamar tersedia di Fase 8.</p>
+                    @php
+                        $role       = auth()->user()->role?->value;
+                        $profile    = auth()->user()->applicantProfile;
+                        $alreadyApplied = $profile ? \App\Models\Application::where('job_posting_id', $job->id)
+                            ->where('applicant_profile_id', $profile->id)->exists() : false;
+                    @endphp
+                    @if ($role === 'applicant')
+                        @if ($alreadyApplied)
+                            <p class="text-sm text-mint text-center">✓ Kamu sudah melamar lowongan ini.</p>
+                            <x-ui.button variant="secondary" class="w-full" href="{{ route('applicant.applications.index') }}">Lihat lamaran</x-ui.button>
+                        @elseif ($job->status->value !== 'open')
+                            <x-ui.button variant="primary" class="w-full" disabled>Lowongan ditutup</x-ui.button>
+                        @elseif (!$profile?->current_cv_document_id)
+                            <x-ui.button variant="secondary" class="w-full" href="{{ route('applicant.cv.index') }}">Upload CV dulu</x-ui.button>
+                            <p class="text-xs text-mist text-center">Kamu butuh CV aktif untuk melamar.</p>
+                        @else
+                            <x-ui.button variant="primary" class="w-full" data-magnetic data-dialog-open="apply-dialog">
+                                Lamar sekarang
+                            </x-ui.button>
+                        @endif
                     @else
-                        <p class="text-sm text-mist">Kamu login sebagai {{ auth()->user()->role?->label() }}.</p>
+                        <p class="text-sm text-mist">Login sebagai {{ auth()->user()->role?->label() }}.</p>
                     @endif
                 @else
                     <x-ui.button variant="primary" class="w-full" href="{{ route('login') }}">
@@ -165,5 +180,77 @@
         </div>
     @endif
 </div>
+
+{{-- Dialog Lamar --}}
+@auth
+    @if (auth()->user()->role?->value === 'applicant')
+        @php
+            $profile  = auth()->user()->applicantProfile;
+            $cvDocs   = auth()->user()->documents()->where('type', 'cv')->latest()->get();
+            $activeCv = $profile?->current_cv_document_id;
+        @endphp
+        <x-ui.modal id="apply-dialog" title="Lamar {{ $job->title }}">
+            <form method="POST" action="{{ route('applicant.applications.store', $job->slug) }}"
+                  id="apply-form" novalidate data-validate>
+                @csrf
+
+                {{-- Pilih CV --}}
+                @if ($cvDocs->isNotEmpty())
+                    <div class="mb-4">
+                        <label class="mb-1 block text-sm font-medium text-mist">CV yang digunakan</label>
+                        <select name="cv_document_id"
+                            class="w-full rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none">
+                            @foreach ($cvDocs as $doc)
+                                <option value="{{ $doc->id }}" @selected($doc->id === $activeCv)>
+                                    {{ $doc->original_name }}
+                                    @if ($doc->id === $activeCv) (Aktif) @endif
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                @endif
+
+                {{-- Surat pengantar --}}
+                <div class="mb-4">
+                    <label class="mb-1 block text-sm font-medium text-mist" for="cover_letter">
+                        Surat pengantar <span class="text-xs">(opsional, maks 1500 karakter)</span>
+                    </label>
+                    <textarea id="cover_letter" name="cover_letter" rows="4" maxlength="1500"
+                        class="w-full rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper placeholder-mist focus:border-signal focus:outline-none"
+                        placeholder="Ceritakan singkat mengapa kamu cocok untuk posisi ini..."></textarea>
+                    <p class="mt-1 text-right text-xs text-mist">
+                        <span id="cover-count">0</span>/1500
+                    </p>
+                </div>
+
+                {{-- Ringkasan profil --}}
+                <div class="rounded-control border border-ink-line bg-ink p-3 text-xs text-mist">
+                    <p><strong class="text-paper">{{ auth()->user()->name }}</strong></p>
+                    @if ($profile?->headline) <p>{{ $profile->headline }}</p> @endif
+                    @if ($profile?->graduation_year) <p>Lulus {{ $profile->graduation_year }}</p> @endif
+                </div>
+
+                @error('apply')
+                    <p class="mt-2 text-xs text-coral">{{ $message }}</p>
+                @enderror
+            </form>
+
+            <x-slot:actions>
+                <x-ui.button variant="primary" type="submit" form="apply-form" loading loading-text="Mengirim...">
+                    Kirim lamaran
+                </x-ui.button>
+                <x-ui.button variant="ghost" data-dialog-close>Batal</x-ui.button>
+            </x-slot:actions>
+        </x-ui.modal>
+
+        <script nonce="{{ Vite::cspNonce() }}">
+            document.getElementById('cover_letter')?.addEventListener('input', function() {
+                document.getElementById('cover-count').textContent = this.value.length;
+            });
+        </script>
+    @endif
+@endauth
 @endsection
+
+
 
