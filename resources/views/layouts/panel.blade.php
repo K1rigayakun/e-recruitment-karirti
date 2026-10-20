@@ -9,22 +9,10 @@
             ["Lamaran",    route("applicant.applications.index")],
             ["Notifikasi", route("notifications.index")],
         ],
-            ["Profil",     route("applicant.profile.edit")],
-            ["CV",         route("applicant.cv.index")],
-            ["Portofolio", route("applicant.projects.index")],
-            ["Lamaran",    "#"],
-            ["Interview",  "#"],
-        ],
         "company" => [
             ["Ringkasan", route("company.dashboard")],
             ["Profil",    route("company.profile.edit")],
             ["Lowongan",  route("company.jobs.index")],
-            ["Pelamar",   "#"],
-            ["Laporan",   "#"],
-        ],
-            ["Profil",    "#"],
-            ["Lowongan",  "#"],
-            ["Pelamar",   "#"],
             ["Laporan",   "#"],
         ],
         "admin" => [
@@ -47,7 +35,6 @@
     <a class="skip-link" href="#main">Lewati ke konten</a>
 
     <div class="flex min-h-dvh">
-        {{-- Sidebar desktop --}}
         <aside class="hidden w-60 shrink-0 border-r border-ink-line bg-ink-raised/60 lg:flex lg:flex-col" aria-label="Navigasi panel">
             <div class="flex h-[4.5rem] items-center px-5">
                 <a href="{{ route("home") }}" class="font-display font-bold text-paper">{{ config("app.name") }}</a>
@@ -70,7 +57,6 @@
         </aside>
 
         <div class="flex min-w-0 flex-1 flex-col">
-            {{-- Topbar --}}
             <header class="sticky top-0 z-30 flex h-[4.5rem] items-center justify-between gap-3 border-b border-ink-line bg-ink/80 px-4 backdrop-blur lg:px-8">
                 <div class="flex items-center gap-3">
                     <button type="button"
@@ -93,7 +79,6 @@
                 </div>
             </header>
 
-            {{-- Mobile drawer --}}
             <div class="fixed inset-0 z-50 hidden lg:hidden" data-nav-overlay>
                 <div class="absolute inset-0 bg-ink/70" data-nav-close></div>
                 <nav id="panel-drawer" class="absolute inset-y-0 left-0 flex w-[min(18rem,88vw)] flex-col gap-2 border-r border-ink-line bg-ink-raised p-5"
@@ -120,5 +105,3 @@
     <x-ui.toast-region />
 </body>
 </html>
-
-

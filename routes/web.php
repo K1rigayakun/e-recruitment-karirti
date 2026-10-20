@@ -15,6 +15,7 @@ use App\Http\Controllers\Auth\PasswordResetLinkController;
 use App\Http\Controllers\Auth\RegisteredApplicantController;
 use App\Http\Controllers\Auth\RegisteredCompanyController;
 use App\Http\Controllers\Auth\VerifyEmailController;
+use App\Http\Controllers\Company\ApplicantController as CompanyApplicantController;
 use App\Http\Controllers\Company\DashboardController as CompanyDashboard;
 use App\Http\Controllers\Company\JobController as CompanyJobController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
@@ -89,7 +90,6 @@ Route::middleware(['auth', 'verified', 'active', 'role:applicant'])
         Route::delete('/proyek/{project}', [PortfolioController::class, 'destroy'])->name('projects.destroy');
         Route::post('/proyek/{project}/naik', [PortfolioController::class, 'moveUp'])->name('projects.move-up');
         Route::post('/proyek/{project}/turun', [PortfolioController::class, 'moveDown'])->name('projects.move-down');
-        // Lamaran
         Route::get('/lamaran', [ApplicationController::class, 'index'])->name('applications.index');
         Route::get('/lamaran/{application}', [ApplicationController::class, 'show'])->name('applications.show');
         Route::post('/lamaran/{application}/batal', [ApplicationController::class, 'withdraw'])->name('applications.withdraw');
@@ -110,6 +110,11 @@ Route::middleware(['auth', 'verified', 'active', 'role:company'])
         Route::delete('/lowongan/{job}', [CompanyJobController::class, 'destroy'])->name('jobs.destroy');
         Route::post('/lowongan/{job}/publikasi', [CompanyJobController::class, 'publish'])->name('jobs.publish');
         Route::post('/lowongan/{job}/tutup', [CompanyJobController::class, 'close'])->name('jobs.close');
+        // Kelola pelamar
+        Route::get('/lowongan/{job}/pelamar', [CompanyApplicantController::class, 'index'])->name('applicants.index');
+        Route::get('/pelamar/{application}', [CompanyApplicantController::class, 'show'])->name('applicants.show');
+        Route::post('/pelamar/{application}/keputusan', [CompanyApplicantController::class, 'decide'])->name('applicants.decide');
+        Route::post('/pelamar/{application}/catatan', [CompanyApplicantController::class, 'note'])->name('applicants.note');
     });
 
 // ── Area admin ────────────────────────────────────────────────────────────────

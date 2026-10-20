@@ -52,4 +52,14 @@ class JobPostingPolicy
         return $user->companyProfile?->id === $job->company_profile_id
             && $job->status === JobStatus::Open;
     }
+
+    /** Pemilik atau admin bisa melihat daftar pelamar */
+    public function viewApplicants(User $user, JobPosting $job): bool
+    {
+        if ($user->role === UserRole::Admin) {
+            return true;
+        }
+
+        return $user->companyProfile?->id === $job->company_profile_id;
+    }
 }
