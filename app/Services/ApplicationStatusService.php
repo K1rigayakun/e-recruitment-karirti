@@ -17,13 +17,16 @@ use Illuminate\Support\Facades\DB;
 class ApplicationStatusService
 {
     /**
+     * @param  bool  $fromScheduler  Harus true jika dipanggil dari InterviewScheduler (BR7)
+     *
      * @throws \DomainException jika transisi tidak valid
      */
     public function transition(
         Application $application,
         ApplicationStatus $to,
         User $actor,
-        ?string $note = null
+        ?string $note = null,
+        bool $fromScheduler = false
     ): Application {
         $from = $application->status;
 
@@ -35,8 +38,7 @@ class ApplicationStatusService
         }
 
         // Transisi ke interview HANYA boleh dari InterviewScheduler (BR7)
-        // Controller yang memanggil service ini tidak boleh request ke=interview langsung
-        if ($to === ApplicationStatus::Interview && ! $this->calledFromInterviewScheduler()) {
+        if ($to === ApplicationStatus::Interview && ! $fromScheduler) {
             throw new \DomainException('Transisi ke Interview hanya boleh lewat penjadwalan interview.');
         }
 
@@ -94,26 +96,19 @@ class ApplicationStatusService
             return;
         }
 
-        // Perusahaan bisa accepted, rejected, viewed — tapi hanya ke lowongannya sendiri
+        // Perusahaan bisa accepted, rejected, viewed, interview — tapi hanya ke lowongannya sendiri
         if ($actor->role === UserRole::Company) {
-            if (! in_array($to, [ApplicationStatus::Viewed, ApplicationStatus::Accepted, ApplicationStatus::Rejected], true)) {
+            if (! in_array($to, [
+                ApplicationStatus::Viewed,
+                ApplicationStatus::Interview,
+                ApplicationStatus::Accepted,
+                ApplicationStatus::Rejected,
+            ], true)) {
                 throw new \DomainException('Perusahaan tidak bisa melakukan transisi ini.');
             }
             if ($application->jobPosting->companyProfile->user_id !== $actor->id) {
                 throw new \DomainException('Kamu tidak punya akses ke lamaran ini.');
             }
         }
-    }
-
-    /** Deteksi apakah dipanggil dari InterviewScheduler (BR7) */
-    private function calledFromInterviewScheduler(): bool
-    {
-        foreach (debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 10) as $frame) {
-            if (isset($frame['class']) && str_contains($frame['class'], 'InterviewScheduler')) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }

@@ -89,6 +89,66 @@
         </div>
     @endif
 
+    {{-- Interview mendatang --}}
+    @if ($application->interviews->isNotEmpty())
+        <div data-reveal="fade-up">
+            <h2 class="mb-3 font-display text-lg text-paper">Interview</h2>
+            @foreach ($application->interviews->whereNotIn('status.value', ['cancelled']) as $interview)
+                @php $iActive = !in_array($interview->status->value, ['cancelled','completed']); @endphp
+                <div class="rounded-card border p-4 space-y-3 {{ $iActive ? 'border-violet/40 bg-violet/5' : 'border-ink-line bg-ink-raised' }}">
+                    <div class="flex items-start justify-between gap-3">
+                        <div>
+                            <p class="font-medium text-paper">
+                                {{ $interview->scheduled_at->setTimezone('Asia/Jakarta')->translatedFormat('l, d M Y H:i') }} WIB
+                            </p>
+                            <p class="text-sm text-mist">{{ $interview->mode->label() }} · {{ $interview->duration_minutes }} menit</p>
+                            @if ($interview->meeting_url)
+                                <a href="{{ $interview->meeting_url }}" target="_blank" rel="noopener noreferrer"
+                                   class="link-draw text-sm text-signal">Buka tautan meeting →</a>
+                            @elseif ($interview->location)
+                                <p class="text-sm text-mist">{{ $interview->location }}</p>
+                            @endif
+                            @if ($interview->instructions)
+                                <p class="mt-2 text-xs text-mist">{{ $interview->instructions }}</p>
+                            @endif
+                        </div>
+                        @php
+                            $tone = match($interview->status->value) {
+                                'confirmed' => 'mint', 'cancelled' => 'coral',
+                                'reschedule_requested' => 'sun', default => 'signal'
+                            };
+                        @endphp
+                        <x-ui.badge :tone="$tone">{{ $interview->status->label() }}</x-ui.badge>
+                    </div>
+
+                    @if ($iActive && $interview->status->value === 'scheduled')
+                        <div class="flex flex-wrap gap-2">
+                            <form method="POST" action="{{ route('applicant.interviews.confirm', $interview) }}">
+                                @csrf
+                                <x-ui.button variant="primary" type="submit" size="sm">Konfirmasi hadir</x-ui.button>
+                            </form>
+                            <x-ui.button variant="ghost" size="sm" data-dialog-open="reschedule-dialog-{{ $interview->id }}">
+                                Ajukan jadwal ulang
+                            </x-ui.button>
+
+                            <x-ui.modal id="reschedule-dialog-{{ $interview->id }}" title="Ajukan jadwal ulang">
+                                <form method="POST" action="{{ route('applicant.interviews.reschedule-request', $interview) }}"
+                                      id="reschedule-form-{{ $interview->id }}">
+                                    @csrf
+                                    <x-ui.textarea name="note" label="Alasan / usulan waktu (opsional)" rows="3"
+                                        placeholder="Contoh: Saya ada kuliah pukul 09.00, bisakah digeser ke sore?" />
+                                </form>
+                                <x-slot:actions>
+                                    <x-ui.button variant="primary" type="submit" form="reschedule-form-{{ $interview->id }}">Kirim permintaan</x-ui.button>
+                                    <x-ui.button variant="ghost" data-dialog-close>Batal</x-ui.button>
+                                </x-slot:actions>
+                            </x-ui.modal>
+                        </div>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
     {{-- Aksi --}}
     @if (! $application->status->isFinal())
         <div>
@@ -108,3 +168,4 @@
     @endif
 </div>
 @endsection
+

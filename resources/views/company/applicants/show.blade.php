@@ -177,11 +177,41 @@
                 </form>
             </div>
 
-            {{-- Jadwalkan interview (disiapkan, diaktifkan Fase 10) --}}
-            <div class="rounded-card border border-ink-line bg-ink-raised p-4" data-reveal="scale-clip">
-                <p class="text-sm font-semibold text-paper">Interview</p>
-                <p class="text-xs text-mist mt-1">Fitur jadwal interview tersedia di Fase 10.</p>
-            </div>
+            {{-- Jadwalkan interview --}}
+            @if (!$application->status->isFinal())
+                <div class="rounded-card border border-ink-line bg-ink-raised p-4 space-y-3" data-reveal="scale-clip">
+                    <p class="text-sm font-semibold text-paper">Jadwalkan interview</p>
+                    <form method="POST" action="{{ route('company.interviews.store', $application) }}" novalidate data-validate>
+                        @csrf
+                        @error('schedule') <p class="text-xs text-coral">{{ $message }}</p> @enderror
+                        <div class="space-y-3">
+                            <input type="datetime-local" name="scheduled_at"
+                                min="{{ now()->addHour()->format('Y-m-d\TH:i') }}"
+                                class="w-full rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none"
+                                required>
+                            <select name="duration_minutes" class="w-full rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none">
+                                @foreach ([15, 30, 45, 60, 90] as $d)
+                                    <option value="{{ $d }}" @selected($d === 60)>{{ $d }} menit</option>
+                                @endforeach
+                            </select>
+                            <select name="mode" id="interview-mode" onchange="toggleInterviewFields(this.value)"
+                                class="w-full rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none">
+                                <option value="online">Online</option>
+                                <option value="onsite">Tatap muka</option>
+                            </select>
+                            <input type="url" name="meeting_url" id="field-meeting-url" placeholder="https://meet.google.com/..."
+                                class="w-full rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none">
+                            <input type="text" name="location" id="field-location" placeholder="Alamat kantor..." style="display:none"
+                                class="w-full rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none">
+                            <textarea name="instructions" rows="2" placeholder="Instruksi untuk pelamar (opsional)"
+                                class="w-full rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none"></textarea>
+                        </div>
+                        <x-ui.button variant="secondary" type="submit" class="w-full" size="sm" loading loading-text="Menjadwalkan...">
+                            Jadwalkan interview
+                        </x-ui.button>
+                    </form>
+                </div>
+            @endif
         </aside>
     </div>
 </div>
@@ -223,4 +253,13 @@
         <x-ui.button variant="ghost" data-dialog-close>Batal</x-ui.button>
     </x-slot:actions>
 </x-ui.modal>
+
+<script nonce="{{ Vite::cspNonce() }}">
+function toggleInterviewFields(mode) {
+    document.getElementById('field-meeting-url').style.display = mode === 'online' ? '' : 'none';
+    document.getElementById('field-location').style.display    = mode === 'onsite' ? '' : 'none';
+}
+</script>
 @endsection
+
+

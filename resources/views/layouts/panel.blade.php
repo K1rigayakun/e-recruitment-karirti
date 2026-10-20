@@ -10,10 +10,11 @@
             ["Notifikasi", route("notifications.index")],
         ],
         "company" => [
-            ["Ringkasan", route("company.dashboard")],
-            ["Profil",    route("company.profile.edit")],
-            ["Lowongan",  route("company.jobs.index")],
-            ["Laporan",   "#"],
+            ["Ringkasan",  route("company.dashboard")],
+            ["Profil",     route("company.profile.edit")],
+            ["Lowongan",   route("company.jobs.index")],
+            ["Interview",  route("company.interviews.index")],
+            ["Laporan",    "#"],
         ],
         "admin" => [
             ["Ringkasan",  route("admin.dashboard")],
@@ -25,8 +26,7 @@
     ];
     $items = $menus[$role] ?? $menus["applicant"];
     $roleLabel = ["applicant" => "Pelamar", "company" => "Perusahaan", "admin" => "Admin"][$role] ?? "Pengguna";
-@endphp
-<!DOCTYPE html>
+@endphp<!DOCTYPE html>
 <html lang="id" class="no-js">
 <head>
     @include("layouts.partials.head")
@@ -105,3 +105,5 @@
     <x-ui.toast-region />
 </body>
 </html>
+
+

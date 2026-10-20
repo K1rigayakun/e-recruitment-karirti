@@ -4,6 +4,7 @@ use App\Http\Controllers\Admin\DashboardController as AdminDashboard;
 use App\Http\Controllers\Applicant\ApplicationController;
 use App\Http\Controllers\Applicant\CvController;
 use App\Http\Controllers\Applicant\DashboardController as ApplicantDashboard;
+use App\Http\Controllers\Applicant\InterviewController as ApplicantInterviewController;
 use App\Http\Controllers\Applicant\NotificationController;
 use App\Http\Controllers\Applicant\PortfolioController;
 use App\Http\Controllers\Applicant\ProfileController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Auth\RegisteredCompanyController;
 use App\Http\Controllers\Auth\VerifyEmailController;
 use App\Http\Controllers\Company\ApplicantController as CompanyApplicantController;
 use App\Http\Controllers\Company\DashboardController as CompanyDashboard;
+use App\Http\Controllers\Company\InterviewController as CompanyInterviewController;
 use App\Http\Controllers\Company\JobController as CompanyJobController;
 use App\Http\Controllers\Company\ProfileController as CompanyProfileController;
 use App\Http\Controllers\DocumentController;
@@ -93,6 +95,9 @@ Route::middleware(['auth', 'verified', 'active', 'role:applicant'])
         Route::get('/lamaran', [ApplicationController::class, 'index'])->name('applications.index');
         Route::get('/lamaran/{application}', [ApplicationController::class, 'show'])->name('applications.show');
         Route::post('/lamaran/{application}/batal', [ApplicationController::class, 'withdraw'])->name('applications.withdraw');
+        // Interview (sisi pelamar)
+        Route::post('/interview/{interview}/konfirmasi', [ApplicantInterviewController::class, 'confirm'])->name('interviews.confirm');
+        Route::post('/interview/{interview}/jadwal-ulang', [ApplicantInterviewController::class, 'requestReschedule'])->name('interviews.reschedule-request');
     });
 
 // ── Area perusahaan ───────────────────────────────────────────────────────────
@@ -110,11 +115,15 @@ Route::middleware(['auth', 'verified', 'active', 'role:company'])
         Route::delete('/lowongan/{job}', [CompanyJobController::class, 'destroy'])->name('jobs.destroy');
         Route::post('/lowongan/{job}/publikasi', [CompanyJobController::class, 'publish'])->name('jobs.publish');
         Route::post('/lowongan/{job}/tutup', [CompanyJobController::class, 'close'])->name('jobs.close');
-        // Kelola pelamar
         Route::get('/lowongan/{job}/pelamar', [CompanyApplicantController::class, 'index'])->name('applicants.index');
         Route::get('/pelamar/{application}', [CompanyApplicantController::class, 'show'])->name('applicants.show');
         Route::post('/pelamar/{application}/keputusan', [CompanyApplicantController::class, 'decide'])->name('applicants.decide');
         Route::post('/pelamar/{application}/catatan', [CompanyApplicantController::class, 'note'])->name('applicants.note');
+        // Interview (sisi perusahaan)
+        Route::get('/interview', [CompanyInterviewController::class, 'index'])->name('interviews.index');
+        Route::post('/pelamar/{application}/interview', [CompanyInterviewController::class, 'store'])->name('interviews.store');
+        Route::put('/interview/{interview}', [CompanyInterviewController::class, 'update'])->name('interviews.update');
+        Route::delete('/interview/{interview}', [CompanyInterviewController::class, 'destroy'])->name('interviews.destroy');
     });
 
 // ── Area admin ────────────────────────────────────────────────────────────────
