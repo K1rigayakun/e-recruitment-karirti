@@ -61,7 +61,7 @@
                            class="rounded-control border border-ink-line px-2 py-1 text-xs text-mist hover:text-paper">Pratinjau</a>
                         @if ($job->status->value === 'draft' && $job->applications_count === 0)
                             <form method="POST" action="{{ route('company.jobs.destroy', $job) }}"
-                                onsubmit="return confirm('Hapus lowongan ini?')">
+                                data-confirm="Hapus lowongan ini?">
                                 @csrf @method('DELETE')
                                 <x-ui.button variant="danger" type="submit" size="sm">Hapus</x-ui.button>
                             </form>

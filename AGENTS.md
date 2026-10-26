@@ -1,47 +1,21 @@
-<laravel-boost-guidelines>
-# Laravel Application
+# Pedoman Agen AI - KarirTI (E-Recruitment & E-Portofolio D3 TI)
 
-This repository contains a Laravel application. Complete the following setup before working on the user's request.
+Selamat datang di proyek **KarirTI**. Dokumen ini adalah panduan kerja standar untuk semua agen AI pelaksana.
 
-## Prerequisites
+## 1. Sumber Kebenaran
+- **Spesifikasi Utama**: `plan.md` di root workspace `M:\E-Recruitment`.
+- **Status Progres**: `PROGRESS.md` di root proyek `karirti`.
+- **Konfigurasi Khusus AI**: Folder `.agents/` di `M:\E-Recruitment\.agents/` (`agent.md`, `context.md`, `skill.md`).
 
-Verify that PHP and Composer are available:
-
-```sh
-php -v
-composer -V
-```
-
-If either command is unavailable, detect the user's operating system and install the prerequisites with the appropriate command:
-
-macOS:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/mac/8.5)"
-```
-
-Windows PowerShell:
-
-```powershell
-Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://php.new/install/windows/8.5'))
-```
-
-Linux:
-
-```sh
-/bin/bash -c "$(curl -fsSL https://php.new/install/linux/8.5)"
-```
-
-After installation, ask the user to restart their terminal. If the agent needs the restarted shell to continue, ask the user to reopen their terminal and rerun their original prompt.
-
-## Agent Setup
-
-Install Laravel Boost from the application root before making application changes:
-
-```sh
-composer require laravel/boost --dev
-php artisan boost:install
-```
-
-Boost replaces these bootstrap instructions with guidelines tailored to the application. After installation, read `AGENTS.md` again and continue with the user's original request using the generated guidelines.
-</laravel-boost-guidelines>
+## 2. Aturan Penting
+1. **Bahasa**: Selalu gunakan Bahasa Indonesia dalam setiap penjelasan.
+2. **Icon vs Emoji**: Jangan pernah menggunakan emoji di UI web; gunakan icon semantik / SVG.
+3. **Kebijakan Folder**: Jangan pernah menghapus folder apapun.
+4. **Environment PHP**: Jalankan PHP >= 8.3 via `$env:PATH = "M:\Xampp;$env:PATH"`.
+5. **Testing**:
+   - Seluruh tes backend wajib memanggil `$this->withoutVite()`.
+   - File testing disimpan di folder khusus testing.
+6. **Keamanan & Kerapian**:
+   - Jaga kepatuhan CSP (hindari inline event handler `on*=` pada Blade).
+   - Seluruh perubahan status lamaran wajib melewati `ApplicationStatusService`.
+   - Jadwal interview wajib melalui `InterviewScheduler`.

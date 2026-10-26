@@ -19,7 +19,7 @@
                     class="w-full rounded-control border border-ink-line bg-ink px-4 py-2 text-sm text-paper placeholder-mist focus:border-signal focus:outline-none focus:ring-1 focus:ring-signal"
                     placeholder="Cari judul, perusahaan, skill…" maxlength="80">
             </div>
-            <select name="sort" onchange="this.form.submit()"
+            <select name="sort" data-autosubmit
                 class="rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none">
                 <option value="latest" @selected(request('sort','latest')==='latest')>Terbaru</option>
                 <option value="deadline" @selected(request('sort')==='deadline')>Tenggat terdekat</option>
@@ -60,7 +60,7 @@
                     <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-mist">Jenis</p>
                     @foreach (\App\Enums\JobType::cases() as $type)
                         <label class="flex cursor-pointer items-center gap-2 py-1 text-sm text-mist hover:text-paper">
-                            <input type="radio" name="type" value="{{ $type->value }}" @checked(request('type')===$type->value) onchange="this.form.submit()" class="text-signal focus:ring-signal">
+                            <input type="radio" name="type" value="{{ $type->value }}" @checked(request('type')===$type->value) data-autosubmit class="text-signal focus:ring-signal">
                             {{ $type->label() }}
                         </label>
                     @endforeach
@@ -72,7 +72,7 @@
                     <p class="mb-3 text-xs font-semibold uppercase tracking-wider text-mist">Mode kerja</p>
                     @foreach (\App\Enums\WorkMode::cases() as $mode)
                         <label class="flex cursor-pointer items-center gap-2 py-1 text-sm text-mist hover:text-paper">
-                            <input type="radio" name="mode" value="{{ $mode->value }}" @checked(request('mode')===$mode->value) onchange="this.form.submit()" class="text-signal focus:ring-signal">
+                            <input type="radio" name="mode" value="{{ $mode->value }}" @checked(request('mode')===$mode->value) data-autosubmit class="text-signal focus:ring-signal">
                             {{ $mode->label() }}
                         </label>
                     @endforeach

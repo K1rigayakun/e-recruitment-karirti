@@ -6,7 +6,7 @@
     role="region"
     aria-label="Notifikasi"
 >
-    @foreach (['success' => 'mint', 'error' => 'coral', 'status' => 'signal'] as $key => $tone)
+    @foreach (['success' => 'mint', 'toast' => 'mint', 'error' => 'coral', 'status' => 'signal'] as $key => $tone)
         @if (session($key))
             <div
                 data-toast

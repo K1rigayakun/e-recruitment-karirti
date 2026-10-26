@@ -1,9 +1,9 @@
 {
     "$schema": "https://getcomposer.org/schema.json",
-    "name": "laravel/laravel",
+    "name": "karirti/karirti",
     "type": "project",
-    "description": "The skeleton application for the Laravel framework.",
-    "keywords": ["laravel", "framework"],
+    "description": "Portal Bursa Kerja & Portofolio Digital Lulusan D3 TI.",
+    "keywords": ["karirti", "e-recruitment", "portfolio", "laravel"],
     "license": "MIT",
     "require": {
         "php": "^8.3",
@@ -47,6 +47,10 @@
         "dev": [
             "Composer\\Config::disableProcessTimeout",
             "@php artisan dev"
+        ],
+        "dev": [
+            "Composer\\Config::disableProcessTimeout",
+            "npx concurrently -c \"#93c5fd,#c4b5fd,#fdba74\" \"php artisan serve\" \"php artisan queue:listen --tries=1\" \"npm run dev\" --names=server,queue,vite"
         ],
         "test": [
             "@php artisan config:clear --ansi @no_additional_args",

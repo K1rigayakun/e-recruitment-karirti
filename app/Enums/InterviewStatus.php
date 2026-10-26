@@ -15,7 +15,7 @@ enum InterviewStatus: string
         return match ($this) {
             self::Scheduled => 'Terjadwal',
             self::Confirmed => 'Dikonfirmasi',
-            self::RescheduleRequested => 'Reschedule diminta',
+            self::RescheduleRequested => 'Jadwal ulang diminta',
             self::Completed => 'Selesai',
             self::Cancelled => 'Dibatalkan',
         };

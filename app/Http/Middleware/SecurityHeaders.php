@@ -15,6 +15,10 @@ class SecurityHeaders
 {
     public function handle(Request $request, Closure $next): Response
     {
+        if (app()->isProduction()) {
+            Vite::useCspNonce();
+        }
+
         $response = $next($request);
 
         $response->headers->set('X-Content-Type-Options', 'nosniff');
@@ -28,7 +32,7 @@ class SecurityHeaders
                 "default-src 'self'",
                 "script-src 'self' 'nonce-{$nonce}'",
                 "style-src 'self' 'unsafe-inline'",
-                "img-src 'self' data: https:",
+                "img-src 'self' data:",
                 "font-src 'self'",
                 "connect-src 'self'",
                 "frame-ancestors 'none'",

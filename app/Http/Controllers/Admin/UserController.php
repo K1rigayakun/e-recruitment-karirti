@@ -15,8 +15,12 @@ class UserController extends Controller
     public function index(Request $request): View
     {
         $users = User::query()
-            ->when($request->get('q'), fn ($q, $s) => $q->where('name', 'like', '%'.escapeLike($s).'%')
-                ->orWhere('email', 'like', '%'.escapeLike($s).'%'))
+            ->when($request->get('q'), function ($q, $s) {
+                $q->where(function ($sub) use ($s) {
+                    $sub->where('name', 'like', '%'.escapeLike($s).'%')
+                        ->orWhere('email', 'like', '%'.escapeLike($s).'%');
+                });
+            })
             ->when($request->get('role'), fn ($q, $r) => $q->where('role', $r))
             ->when($request->get('status'), fn ($q, $s) => $q->where('is_active', $s === 'active'))
             ->latest()

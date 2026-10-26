@@ -47,11 +47,10 @@ class JobController extends Controller
         $job->company_profile_id = $profile->id;
         $job->slug = $slug;
         $job->status = JobStatus::Draft;
+        $job->show_salary = $request->boolean('show_salary');
         $job->save();
 
-        if (! empty($data['skills'])) {
-            $job->skills()->sync($data['skills']);
-        }
+        $job->skills()->sync($data['skills'] ?? []);
 
         return redirect()->route('company.jobs.index')
             ->with('toast', 'Lowongan berhasil disimpan sebagai draft.');
@@ -71,11 +70,10 @@ class JobController extends Controller
         $data = $request->validated();
 
         $job->fill(collect($data)->except('skills')->toArray());
+        $job->show_salary = $request->boolean('show_salary');
         $job->save();
 
-        if (isset($data['skills'])) {
-            $job->skills()->sync($data['skills']);
-        }
+        $job->skills()->sync($data['skills'] ?? []);
 
         return redirect()->route('company.jobs.index')
             ->with('toast', 'Lowongan berhasil diperbarui.');

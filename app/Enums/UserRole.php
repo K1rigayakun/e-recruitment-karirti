@@ -16,4 +16,13 @@ enum UserRole: string
             self::Applicant => 'Pelamar',
         };
     }
+
+    public function dashboardRoute(): string
+    {
+        return match ($this) {
+            self::Admin => route('admin.dashboard'),
+            self::Company => route('company.dashboard'),
+            self::Applicant => route('applicant.dashboard'),
+        };
+    }
 }

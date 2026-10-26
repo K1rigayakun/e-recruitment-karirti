@@ -28,62 +28,69 @@ class ApplicationStatusService
         ?string $note = null,
         bool $fromScheduler = false
     ): Application {
-        $from = $application->status;
-
-        // Validasi matriks transisi (plan.md 7.4)
-        if (! $from->canMoveTo($to)) {
-            throw new \DomainException(
-                "Transisi dari {$from->label()} ke {$to->label()} tidak diizinkan."
-            );
-        }
-
-        // Transisi ke interview HANYA boleh dari InterviewScheduler (BR7)
-        if ($to === ApplicationStatus::Interview && ! $fromScheduler) {
-            throw new \DomainException('Transisi ke Interview hanya boleh lewat penjadwalan interview.');
-        }
-
-        // Validasi aktor sesuai matriks (plan.md 7.4)
+        // Validasi awal aktor
         $this->assertActorAllowed($actor, $to, $application);
 
-        DB::transaction(function () use ($application, $from, $to, $actor, $note): void {
+        $freshApp = DB::transaction(function () use ($application, $to, $actor, $note, $fromScheduler): Application {
             // Lock row agar tidak ada race condition
-            $application = Application::lockForUpdate()->find($application->id);
+            /** @var Application $locked */
+            $locked = Application::lockForUpdate()->findOrFail($application->id);
+            $from = $locked->status;
 
-            $application->status = $to;
+            // Validasi matriks transisi pada data yang telah di-lock
+            if (! $from->canMoveTo($to)) {
+                throw new \DomainException(
+                    "Transisi dari {$from->label()} ke {$to->label()} tidak diizinkan."
+                );
+            }
 
-            if ($to === ApplicationStatus::Viewed && is_null($application->viewed_at)) {
-                $application->viewed_at = now();
+            // Transisi ke interview HANYA boleh dari InterviewScheduler (BR7)
+            if ($to === ApplicationStatus::Interview && ! $fromScheduler) {
+                throw new \DomainException('Transisi ke Interview hanya boleh lewat penjadwalan interview.');
+            }
+
+            $locked->status = $to;
+
+            if ($to === ApplicationStatus::Viewed && is_null($locked->viewed_at)) {
+                $locked->viewed_at = now();
             }
 
             if (in_array($to, [ApplicationStatus::Accepted, ApplicationStatus::Rejected], true)) {
-                $application->decided_at = now();
+                $locked->decided_at = now();
             }
 
-            $application->save();
+            $locked->save();
 
             // Catat history
-            $application->statusHistories()->create([
+            $locked->statusHistories()->create([
                 'from_status' => $from->value,
                 'to_status' => $to->value,
                 'note' => $note,
                 'changed_by' => $actor->id,
                 'created_at' => now(),
             ]);
+
+            return $locked;
         });
 
         // Notifikasi ke pelamar di luar transaksi (queue)
         if ($to !== ApplicationStatus::Applied) {
-            $applicantUser = $application->applicantProfile->user;
+            $applicantUser = $freshApp->applicantProfile->user;
             if ($applicantUser) {
-                $applicantUser->notify(new ApplicationStatusChanged($application->fresh()));
+                $applicantUser->notify(new ApplicationStatusChanged($freshApp));
             }
         }
 
-        return $application->fresh();
+        return $freshApp;
     }
 
     private function assertActorAllowed(User $actor, ApplicationStatus $to, Application $application): void
     {
+        // Admin tidak boleh mengubah status seleksi teknis pelamar
+        if ($actor->role === UserRole::Admin) {
+            throw new \DomainException('Admin tidak diizinkan mengubah status seleksi pelamar.');
+        }
+
         // Pelamar hanya bisa withdraw
         if ($actor->role === UserRole::Applicant) {
             if ($to !== ApplicationStatus::Withdrawn) {

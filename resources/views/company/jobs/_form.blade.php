@@ -46,6 +46,7 @@
                 :error="$errors->first('salary_max')" />
         </div>
         <label class="flex items-center gap-2 text-sm text-mist">
+            <input type="hidden" name="show_salary" value="0">
             <input type="checkbox" name="show_salary" value="1" class="rounded border-ink-line bg-ink text-signal focus:ring-signal"
                 @checked(old('show_salary', $job?->show_salary))>
             Tampilkan gaji kepada pelamar

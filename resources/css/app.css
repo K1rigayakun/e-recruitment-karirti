@@ -1,6 +1,4 @@
 @import "tailwindcss";
-@import "@fontsource-variable/bricolage-grotesque";
-@import "@fontsource-variable/plus-jakarta-sans";
 
 @theme {
   --color-ink: #0A1633;

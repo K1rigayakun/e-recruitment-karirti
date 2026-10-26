@@ -19,6 +19,13 @@ class StoreJobRequest extends FormRequest
         return $this->baseRules();
     }
 
+    protected function prepareForValidation(): void
+    {
+        $this->merge([
+            'show_salary' => $this->boolean('show_salary'),
+        ]);
+    }
+
     protected function baseRules(): array
     {
         return [

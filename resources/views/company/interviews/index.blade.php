@@ -83,7 +83,7 @@
                             @if (!in_array($interview->status->value, ['cancelled', 'completed']))
                                 <div class="flex gap-2">
                                     <form method="POST" action="{{ route('company.interviews.destroy', $interview) }}"
-                                        onsubmit="return confirm('Batalkan interview ini?')">
+                                        data-confirm="Batalkan interview ini?">
                                         @csrf @method('DELETE')
                                         <x-ui.button variant="ghost" type="submit" size="sm">Batalkan</x-ui.button>
                                     </form>

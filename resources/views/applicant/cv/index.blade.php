@@ -6,7 +6,7 @@
 <div class="mx-auto max-w-2xl space-y-8" data-page-enter>
     <div>
         <h1 class="font-display text-2xl text-paper">CV saya</h1>
-        <p class="mt-1 text-sm text-mist">Upload CV dalam format PDF. Maks {{ config('karirti.cv_max_kb') / 1024 }} MB.</p>
+        <p class="mt-1 text-sm text-mist">Unggah CV dalam format PDF. Maks {{ config('karirti.cv_max_kb') / 1024 }} MB.</p>
     </div>
 
     @if ($errors->any())
@@ -55,7 +55,7 @@
                         <a href="{{ route('documents.show', $doc) }}" target="_blank" rel="noopener noreferrer"
                            class="rounded-control border border-ink-line px-3 py-1.5 text-xs text-mist hover:text-paper">Lihat</a>
                         <form method="POST" action="{{ route('applicant.cv.destroy', $doc) }}"
-                            onsubmit="return confirm('Hapus CV ini?')">
+                            data-confirm="Hapus CV ini?">
                             @csrf @method('DELETE')
                             <x-ui.button variant="danger" type="submit" size="sm">Hapus</x-ui.button>
                         </form>

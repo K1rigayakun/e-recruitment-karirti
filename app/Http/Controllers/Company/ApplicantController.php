@@ -35,6 +35,7 @@ class ApplicantController extends Controller
             ->when($request->get('sort') === 'profile', fn ($q) => $q->join(
                 'applicant_profiles', 'applications.applicant_profile_id', '=', 'applicant_profiles.id'
             )->orderByDesc('applicant_profiles.alumni_verified_at'))
+            ->select('applications.*')
             ->latest('applications.created_at')
             ->paginate(15)->withQueryString();
 

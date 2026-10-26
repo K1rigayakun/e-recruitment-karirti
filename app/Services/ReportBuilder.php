@@ -8,6 +8,7 @@ use App\Models\JobPosting;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 /**
  * Query laporan teragregasi. Semua filter divalidasi di controller sebelum masuk ke sini.
@@ -33,10 +34,15 @@ class ReportBuilder
      */
     public function monthlyTrend(?int $companyProfileId = null): array
     {
-        $query = Application::selectRaw("strftime('%Y-%m', created_at) as month, count(*) as total")
+        $driver = DB::connection()->getDriverName();
+        $expr = $driver === 'sqlite'
+            ? "strftime('%Y-%m', created_at)"
+            : "DATE_FORMAT(created_at, '%Y-%m')";
+
+        $query = Application::selectRaw("{$expr} as month, count(*) as total")
             ->where('created_at', '>=', now()->subMonths(12)->startOfMonth())
-            ->groupByRaw("strftime('%Y-%m', created_at)")
-            ->orderByRaw("strftime('%Y-%m', created_at)");
+            ->groupByRaw($expr)
+            ->orderByRaw($expr);
 
         if ($companyProfileId) {
             $query->forCompany($companyProfileId);

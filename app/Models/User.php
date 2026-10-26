@@ -58,4 +58,9 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(AuditLog::class);
     }
+
+    public function dashboardRoute(): string
+    {
+        return $this->role?->dashboardRoute() ?? route('applicant.dashboard');
+    }
 }

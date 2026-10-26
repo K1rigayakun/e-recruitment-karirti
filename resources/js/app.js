@@ -1,3 +1,5 @@
+import "@fontsource-variable/bricolage-grotesque";
+import "@fontsource-variable/plus-jakarta-sans";
 import { initUi } from "./ui/index.js";
 import { initMotion } from "./motion/index.js";
 import { replayPipeline } from "./motion/pipeline.js";

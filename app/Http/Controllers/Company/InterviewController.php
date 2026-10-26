@@ -66,7 +66,7 @@ class InterviewController extends Controller
         abort_if($application->status->isFinal(), 403, 'Lamaran sudah final.');
 
         $data = $request->validated();
-        $data['scheduled_at'] = Carbon::parse($data['scheduled_at'])->setTimezone('Asia/Jakarta');
+        $data['scheduled_at'] = Carbon::parse($data['scheduled_at']);
 
         try {
             $interview = $this->scheduler->schedule($application, $request->user(), $data);
@@ -89,7 +89,7 @@ class InterviewController extends Controller
         );
 
         $data = $request->validated();
-        $data['scheduled_at'] = Carbon::parse($data['scheduled_at'])->setTimezone('Asia/Jakarta');
+        $data['scheduled_at'] = Carbon::parse($data['scheduled_at']);
 
         try {
             $this->scheduler->reschedule($interview, $request->user(), $data);

@@ -40,8 +40,9 @@ export function initDialogs(root = document) {
       dialog._opener = btn;
       dialog.showModal();
       animateIn(dialog);
+      const firstField = dialog.querySelector("[autofocus], input:not([type=hidden]):not([disabled]), textarea:not([disabled]), select:not([disabled])");
       const closeBtn = dialog.querySelector("[data-dialog-close]");
-      (closeBtn instanceof HTMLElement ? closeBtn : dialog).focus();
+      (firstField instanceof HTMLElement ? firstField : (closeBtn instanceof HTMLElement ? closeBtn : dialog)).focus();
     });
   });
 

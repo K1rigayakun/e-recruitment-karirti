@@ -24,8 +24,8 @@ class GithubUrl implements ValidationRule
         $user = '[A-Za-z0-9](?:[A-Za-z0-9-]{0,38})';
         $repo = '[A-Za-z0-9._-]{1,100}';
         $pattern = $this->requireRepo
-            ? "#^https://(www\.)?github\.com/{$user}/{$repo}/?$#"
-            : "#^https://(www\.)?github\.com/{$user}(/{$repo})?/?$#";
+            ? "#\\Ahttps://(www\\.)?github\\.com/{$user}/{$repo}/?\\z#D"
+            : "#\\Ahttps://(www\\.)?github\\.com/{$user}(/{$repo})?/?\\z#D";
 
         if (! preg_match($pattern, $value)) {
             $fail('Tautan GitHub tidak valid. Contoh: https://github.com/username/nama-repo');

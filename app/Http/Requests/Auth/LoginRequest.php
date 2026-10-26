@@ -35,6 +35,7 @@ class LoginRequest extends FormRequest
 
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
+            RateLimiter::hit($this->ipThrottleKey());
 
             // Pesan netral — tidak membocorkan apakah email terdaftar
             throw ValidationException::withMessages([
@@ -43,6 +44,7 @@ class LoginRequest extends FormRequest
         }
 
         RateLimiter::clear($this->throttleKey());
+        RateLimiter::clear($this->ipThrottleKey());
     }
 
     /**
@@ -50,6 +52,18 @@ class LoginRequest extends FormRequest
      */
     public function ensureIsNotRateLimited(): void
     {
+        if (RateLimiter::tooManyAttempts($this->ipThrottleKey(), 20)) {
+            event(new Lockout($this));
+            $seconds = RateLimiter::availableIn($this->ipThrottleKey());
+
+            throw ValidationException::withMessages([
+                'email' => __('auth.throttle', [
+                    'seconds' => $seconds,
+                    'minutes' => ceil($seconds / 60),
+                ]),
+            ]);
+        }
+
         if (! RateLimiter::tooManyAttempts($this->throttleKey(), 5)) {
             return;
         }
@@ -69,5 +83,10 @@ class LoginRequest extends FormRequest
     public function throttleKey(): string
     {
         return Str::transliterate(Str::lower($this->string('email')).'|'.$this->ip());
+    }
+
+    public function ipThrottleKey(): string
+    {
+        return 'login-ip|'.$this->ip();
     }
 }

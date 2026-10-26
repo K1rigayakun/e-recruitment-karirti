@@ -10,8 +10,8 @@ class AdminSeeder extends Seeder
 {
     public function run(): void
     {
-        $email = env('ADMIN_EMAIL', '');
-        $password = env('ADMIN_PASSWORD', '');
+        $email = (string) (config('karirti.admin_email') ?: env('ADMIN_EMAIL', ''));
+        $password = (string) (config('karirti.admin_password') ?: env('ADMIN_PASSWORD', ''));
 
         // Di environment local: gunakan default demo jika env belum diisi
         if (app()->environment('local')) {

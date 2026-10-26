@@ -43,15 +43,15 @@ Route::get('/p/{slug}', [PublicPortfolioController::class, 'show'])->name('portf
 // ── Auth: tamu saja ───────────────────────────────────────────────────────────
 Route::middleware('guest')->group(function (): void {
     Route::get('/masuk', [AuthenticatedSessionController::class, 'create'])->name('login');
-    Route::post('/masuk', [AuthenticatedSessionController::class, 'store']);
+    Route::post('/masuk', [AuthenticatedSessionController::class, 'store'])->middleware('throttle:10,1');
     Route::get('/daftar/pelamar', [RegisteredApplicantController::class, 'create'])->name('register.applicant');
-    Route::post('/daftar/pelamar', [RegisteredApplicantController::class, 'store']);
+    Route::post('/daftar/pelamar', [RegisteredApplicantController::class, 'store'])->middleware('throttle:6,1');
     Route::get('/daftar/perusahaan', [RegisteredCompanyController::class, 'create'])->name('register.company');
-    Route::post('/daftar/perusahaan', [RegisteredCompanyController::class, 'store']);
+    Route::post('/daftar/perusahaan', [RegisteredCompanyController::class, 'store'])->middleware('throttle:6,1');
     Route::get('/lupa-password', [PasswordResetLinkController::class, 'create'])->name('password.request');
-    Route::post('/lupa-password', [PasswordResetLinkController::class, 'store'])->name('password.email');
+    Route::post('/lupa-password', [PasswordResetLinkController::class, 'store'])->name('password.email')->middleware('throttle:6,1');
     Route::get('/reset-password/{token}', [NewPasswordController::class, 'create'])->name('password.reset');
-    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.store');
+    Route::post('/reset-password', [NewPasswordController::class, 'store'])->name('password.store')->middleware('throttle:6,1');
 });
 
 // ── Auth: sudah login ─────────────────────────────────────────────────────────

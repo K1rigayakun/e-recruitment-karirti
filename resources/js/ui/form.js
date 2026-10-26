@@ -41,8 +41,19 @@ export function initForms(root = document) {
     const bar = document.querySelector("[data-password-meter-bar]");
     if (!(input instanceof HTMLInputElement) || !bar) return;
     input.addEventListener("input", () => {
-      const v = input.value.length;
-      const score = Math.min(1, v / 12);
+      const val = input.value;
+      if (!val) {
+        bar.style.transform = "scaleX(0)";
+        return;
+      }
+      let score = 0;
+      if (val.length >= 8) score += 0.25;
+      if (val.length >= 12) score += 0.25;
+      if (/[a-z]/.test(val) && /[A-Z]/.test(val)) score += 0.2;
+      if (/[0-9]/.test(val)) score += 0.15;
+      if (/[^A-Za-z0-9]/.test(val)) score += 0.15;
+
+      score = Math.min(1, score);
       if (isReduced()) {
         bar.style.transform = `scaleX(${score})`;
         return;

@@ -117,7 +117,7 @@
                         @elseif ($job->status->value !== 'open')
                             <x-ui.button variant="primary" class="w-full" disabled>Lowongan ditutup</x-ui.button>
                         @elseif (!$profile?->current_cv_document_id)
-                            <x-ui.button variant="secondary" class="w-full" href="{{ route('applicant.cv.index') }}">Upload CV dulu</x-ui.button>
+                            <x-ui.button variant="secondary" class="w-full" href="{{ route('applicant.cv.index') }}">Unggah CV dulu</x-ui.button>
                             <p class="text-xs text-mist text-center">Kamu butuh CV aktif untuk melamar.</p>
                         @else
                             <x-ui.button variant="primary" class="w-full" data-magnetic data-dialog-open="apply-dialog">
@@ -135,7 +135,7 @@
                 @endauth
 
                 <button type="button" class="w-full text-sm text-mist hover:text-paper flex items-center justify-center gap-2"
-                    onclick="navigator.clipboard.writeText('{{ route('jobs.show', $job->slug) }}').then(()=>window.karirti?.showToast('Tautan disalin!','mint'))">
+                    data-copy="{{ route('jobs.show', $job->slug) }}">
                     <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
                         <path d="M7 3.5A1.5 1.5 0 018.5 2h3.879a1.5 1.5 0 011.06.44l3.122 3.12A1.5 1.5 0 0117 6.622V12.5a1.5 1.5 0 01-1.5 1.5h-1v-3.379a3 3 0 00-.879-2.121L10.5 5.379A3 3 0 008.379 4.5H7v-1zm-2 0v1H4.5A1.5 1.5 0 003 6v10a1.5 1.5 0 001.5 1.5h7A1.5 1.5 0 0013 16v-.5h1.5A1.5 1.5 0 0016 14V6.622a1.5 1.5 0 00-.44-1.06L12.44 2.44A1.5 1.5 0 0011.378 2H8.5A1.5 1.5 0 007 3.5z"/>
                     </svg>

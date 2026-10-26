@@ -71,7 +71,7 @@
             <div class="rounded-card border border-ink-line bg-ink-raised p-6" data-reveal="scale-clip">
                 <span class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-signal/20 font-display text-lg font-bold text-signal">1</span>
                 <h3 class="font-display text-lg text-paper">Lengkapi profil dan CV</h3>
-                <p class="mt-2 text-sm text-mist">Upload CV PDF, tambahkan link GitHub, dan pilih keahlianmu. Profilmu jadi portofolio digital.</p>
+                <p class="mt-2 text-sm text-mist">Unggah CV PDF, tambahkan link GitHub, dan pilih keahlianmu. Profilmu jadi portofolio digital.</p>
             </div>
             <div class="rounded-card border border-ink-line bg-ink-raised p-6" data-reveal="scale-clip">
                 <span class="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-full bg-sun/20 font-display text-lg font-bold text-sun">2</span>

@@ -194,7 +194,7 @@
                                     <option value="{{ $d }}" @selected($d === 60)>{{ $d }} menit</option>
                                 @endforeach
                             </select>
-                            <select name="mode" id="interview-mode" onchange="toggleInterviewFields(this.value)"
+                            <select name="mode" id="interview-mode" data-interview-mode-toggle
                                 class="w-full rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none">
                                 <option value="online">Online</option>
                                 <option value="onsite">Tatap muka</option>
@@ -253,13 +253,6 @@
         <x-ui.button variant="ghost" data-dialog-close>Batal</x-ui.button>
     </x-slot:actions>
 </x-ui.modal>
-
-<script nonce="{{ Vite::cspNonce() }}">
-function toggleInterviewFields(mode) {
-    document.getElementById('field-meeting-url').style.display = mode === 'online' ? '' : 'none';
-    document.getElementById('field-location').style.display    = mode === 'onsite' ? '' : 'none';
-}
-</script>
 @endsection
 
 

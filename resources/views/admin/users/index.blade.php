@@ -9,14 +9,14 @@
     <form method="GET" action="{{ route('admin.users.index') }}" class="flex flex-wrap gap-3">
         <input name="q" value="{{ request('q') }}" placeholder="Cari nama / email"
             class="rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper placeholder-mist focus:border-signal focus:outline-none">
-        <select name="role" onchange="this.form.submit()"
+        <select name="role" data-autosubmit
             class="rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none">
             <option value="">Semua role</option>
             @foreach (\App\Enums\UserRole::cases() as $r)
                 <option value="{{ $r->value }}" @selected(request('role') === $r->value)>{{ $r->label() }}</option>
             @endforeach
         </select>
-        <select name="status" onchange="this.form.submit()"
+        <select name="status" data-autosubmit
             class="rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none">
             <option value="">Semua status</option>
             <option value="active" @selected(request('status')==='active')>Aktif</option>

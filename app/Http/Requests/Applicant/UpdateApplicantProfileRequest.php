@@ -22,7 +22,18 @@ class UpdateApplicantProfileRequest extends FormRequest
             'graduation_year' => ['nullable', 'integer', 'min:2000', 'max:'.date('Y', strtotime('+1 year'))],
             'nim' => ['nullable', 'string', 'max:20', 'alpha_num'],
             'github_url' => ['nullable', 'string', new GithubUrl(requireRepo: false)],
-            'linkedin_url' => ['nullable', 'url:https', 'regex:/linkedin\.com/i'],
+            'linkedin_url' => [
+                'nullable',
+                'url:https',
+                function (string $attribute, mixed $value, \Closure $fail): void {
+                    if ($value) {
+                        $host = parse_url((string) $value, PHP_URL_HOST);
+                        if (! $host || ! preg_match('/^(www\.)?linkedin\.com$/i', $host)) {
+                            $fail('Tautan LinkedIn harus mengarah ke situs linkedin.com.');
+                        }
+                    }
+                },
+            ],
             'skills' => ['nullable', 'array', 'max:15'],
             'skills.*' => ['integer', 'exists:skills,id'],
             'is_public' => ['boolean'],

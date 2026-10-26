@@ -16,8 +16,8 @@
         <h1 class="font-display text-3xl text-paper -mt-8">Sesi habis.</h1>
         <p class="text-mist">Muat ulang halaman lalu coba lagi. Ini biasanya terjadi jika tab terlalu lama tidak aktif.</p>
         <div class="flex justify-center gap-3">
-            <button type="button" onclick="location.reload()" class="rounded-control border border-signal/40 bg-signal/10 px-5 py-2.5 text-sm font-medium text-signal hover:bg-signal/20">Muat ulang halaman</button>
-            <a href="javascript:history.back()" class="rounded-control border border-ink-line px-5 py-2.5 text-sm text-mist hover:text-paper">Kembali</a>
+            <button type="button" data-reload class="rounded-control border border-signal/40 bg-signal/10 px-5 py-2.5 text-sm font-medium text-signal hover:bg-signal/20">Muat ulang halaman</button>
+            <a href="/" class="rounded-control border border-ink-line px-5 py-2.5 text-sm text-mist hover:text-paper">Beranda</a>
         </div>
     </div>
 </body>

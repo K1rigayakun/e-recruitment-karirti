@@ -7,7 +7,7 @@
     <h1 class="font-display text-2xl text-paper">Moderasi lowongan</h1>
 
     <form method="GET" class="flex gap-3">
-        <select name="status" onchange="this.form.submit()"
+        <select name="status" data-autosubmit
             class="rounded-control border border-ink-line bg-ink px-3 py-2 text-sm text-paper focus:border-signal focus:outline-none">
             <option value="">Semua</option>
             @foreach (\App\Enums\JobStatus::cases() as $s)

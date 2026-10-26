@@ -3,11 +3,14 @@
 namespace App\Providers;
 
 use App\Models\Document;
+use App\Models\JobPosting;
 use App\Models\PortfolioProject;
 use App\Policies\DocumentPolicy;
+use App\Policies\JobPostingPolicy;
 use App\Policies\PortfolioProjectPolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rules\Password;
 
@@ -24,6 +27,8 @@ class AppServiceProvider extends AuthServiceProvider
     public function boot(): void
     {
         $this->registerPolicies();
+
+        Paginator::defaultView('vendor.pagination.karirti');
 
         Model::shouldBeStrict(! app()->isProduction());
 

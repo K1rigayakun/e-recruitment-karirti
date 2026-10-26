@@ -66,7 +66,7 @@
                         <div class="flex gap-2 shrink-0">
                             <x-ui.button variant="ghost" href="{{ route('applicant.projects.edit', $project) }}" size="sm">Edit</x-ui.button>
                             <form method="POST" action="{{ route('applicant.projects.destroy', $project) }}"
-                                onsubmit="return confirm('Hapus project ini?')">
+                                data-confirm="Hapus project ini?">
                                 @csrf @method('DELETE')
                                 <x-ui.button variant="danger" type="submit" size="sm">Hapus</x-ui.button>
                             </form>

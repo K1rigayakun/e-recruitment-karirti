@@ -64,10 +64,27 @@ php artisan serve
 | 10 | Cek bentrok interview di PHP (bukan SQL) agar kompatibel SQLite di test |
 | 11 | Chart.js dimuat dinamis lewat `import()` hanya jika ada `[data-chart]` |
 
-## Statistik Akhir
+## Milestone v1.1.0 — Stabilisasi & Hardening Production (25 Okt 2026)
 
-- **Tests**: 100 passed, 210 assertions
-- **Files PHP**: 163 files (Pint bersih)
-- **Routes**: ~70 routes terdaftar
+- **A1**: Portabilitas query bulanan `ReportBuilder` (MySQL `DATE_FORMAT` & SQLite `strftime`) — error 500 admin teratasi.
+- **A2**: CSP Nonce diaktifkan via `Vite::useCspNonce()`, 18 inline event handlers dihapus dan digantikan delegasi `data-*` di `delegations.js`.
+- **A3**: Sinkronisasi timezone `Asia/Jakarta` di `config/app.php` dan pembersihan double timezone parsing.
+- **A4**: Pemisahan copy teks dan route tujuan notifikasi email `ApplicationReceived` untuk perusahaan.
+- **A5**: Rendering flash message session `'toast'` pada `toast-region.blade.php`.
+- **B1**: Penerapan throttling `throttle:6,1` pada pendaftaran/reset password dan limiter IP pada login.
+- **B2**: Perbaikan grouped WHERE pada pencarian pengguna di `Admin/UserController`.
+- **B3**: Pencegahan penimpaan ID lamaran saat join profil pelamar (`select('applications.*')`).
+- **B4**: Penanganan uncheck `show_salary` dan sinkronisasi keahlian kosong di lowongan.
+- **B5**: Bundling otomatis berkas font WOFF2 ke `public/build/assets/`.
+- **B6**: Komponen paginasi bertema gelap KarirTI dan lokalisasi `lang/id/pagination.php`.
+- **B8**: Otomasi status re-verifikasi `pending` saat perusahaan mengubah nama/website.
+- **C1 - D8**: Concurrency lock pada status lamaran, guard status interview, validasi ekspor CSV, perbaikan URL GitHub/LinkedIn, dan pembersihan skeleton.
+
+## Statistik Terkini (v1.1.0)
+
+- **Tests**: 113 passed, 252 assertions (100% green di SQLite & MySQL)
+- **Inline Event Handlers**: 0 temuan (100% CSP compliant)
+- **Routes**: 83 routes terdaftar
+- **npm build**: Bersih (tanpa warning font / aset)
 - **npm audit**: 0 vulnerabilities
 - **composer audit**: No advisories

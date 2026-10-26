@@ -22,7 +22,7 @@ class InterviewRescheduleRequested extends Notification implements ShouldQueue
     public function toMail(object $notifiable): MailMessage
     {
         $job = $this->interview->application->jobPosting;
-        $scheduled = $this->interview->scheduled_at->setTimezone('Asia/Jakarta');
+        $scheduled = $this->interview->scheduled_at;
         $tanggal = $scheduled->translatedFormat('l, d M Y H:i').' WIB';
         $durasi = $this->interview->duration_minutes.' menit';
         $mode = $this->interview->mode->label();

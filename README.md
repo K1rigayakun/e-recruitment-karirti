@@ -7,86 +7,89 @@ Portal bursa kerja khusus lulusan D3 Teknik Informatika. Perusahaan memasang low
 - **3 Role**: Admin, Perusahaan, Pelamar — masing-masing dengan hak akses terpisah
 - **Upload CV PDF aman**: disk privat, magic bytes check, nama UUID
 - **Portofolio GitHub**: link repo + demo, tampil sebagai "repo card"
-- **Pipeline tracking**: status lamaran real-time (Dilamar → Dilihat → Interview → Diterima/Ditolak)
+- **Pipeline tracking**: pelacakan status lamaran terstruktur (Dilamar → Dilihat → Interview → Diterima/Ditolak)
 - **E-Interview Scheduling**: jadwal online/offline, konfirmasi, reschedule
-- **Notifikasi email + in-app**: semua perubahan status dikirim otomatis
+- **Notifikasi email + in-app**: notifikasi terkirim via antrean database (queue worker)
 - **Laporan & ekspor CSV**: funnel status, tren per bulan, ekspor aman (anti CSV injection)
 - **Animasi smooth**: anime.js v4, hero pipeline SVG, spotlight kursor
-- **Keamanan**: CSRF, rate limit, CSP, audit log, BR13
+- **Keamanan**: CSRF, rate limit, CSP Nonce, audit log, BR13
 
 ## Stack
 
 | Layer | Teknologi | Versi |
 |-------|-----------|-------|
 | Backend | Laravel | 13.37.0 |
-| Runtime | PHP | 8.3.35 |
-| Database | MySQL/MariaDB | 10.4+ |
+| Runtime | PHP | 8.3+ |
+| Database | MySQL / MariaDB / SQLite | 10.4+ |
 | Frontend CSS | Tailwind CSS | 4.3.3 |
 | Animasi | anime.js | 4.5.0 |
 | Chart | Chart.js | 4.x |
 | Build | Vite | 8.x |
-| Font | Bricolage Grotesque + Plus Jakarta Sans | self-host |
+| Font | Bricolage Grotesque + Plus Jakarta Sans | Self-hosted WOFF2 |
 
-## Instalasi Lokal (Windows)
+## Instalasi & Menjalankan Proyek
 
 ### Prasyarat
 
-- PHP 8.3+ di `M:\Xampp\php.exe` (atau sesuai lokasi Anda)
+- PHP >= 8.3 dengan ekstensi `pdo`, `mbstring`, `curl`, `openssl`, `fileinfo`
 - Composer 2
-- Node.js 22 LTS
-- MySQL/MariaDB
+- Node.js 22 LTS & npm
+- Basis Data: MariaDB / MySQL / SQLite
 
-### Langkah
+### Langkah Instalasi
 
-```powershell
-# Set PATH PHP 8.3
-$env:PATH = "M:\Xampp;$env:PATH"
-
-# Clone/masuk ke folder
+```bash
+# 1. Clone & masuk ke folder kerja
 cd karirti
 
-# Install dependensi
+# 2. Install dependensi
 composer install
 npm install
 
-# Konfigurasi
+# 3. Konfigurasi Environment
 cp .env.example .env
 php artisan key:generate
 
-# Edit .env: isi DB_CONNECTION, DB_DATABASE, DB_USERNAME, DB_PASSWORD
+# 4. Migrasi & Seed Data Demo
+php artisan migrate:fresh --seed
 
-# Buat database
-mysql -u root -e "CREATE DATABASE IF NOT EXISTS karirti CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-# Migrasi + seed data demo
-php artisan migrate --seed
-
-# Build aset
+# 5. Build Aset Frontend
 npm run build
-
-# Jalankan server
-php artisan serve
 ```
 
-Buka: `http://localhost:8000`
+### Menjalankan Server & Queue Worker
+
+Untuk memastikan notifikasi email dan in-app bekerja dengan baik, jalankan aplikasi menggunakan script simultan:
+
+```bash
+composer run dev
+```
+
+Script di atas akan menjalankan `php artisan serve`, `php artisan queue:listen`, dan `npm run dev` secara paralel.
+Atau secara manual di dua terminal terpisah:
+```bash
+# Terminal 1: Web Server
+php artisan serve
+
+# Terminal 2: Queue Worker
+php artisan queue:work
+```
+
+Buka peramban di: `http://localhost:8000`
 
 ## Akun Demo Lokal
 
 | Role | Email | Password |
 |------|-------|---------|
 | Admin | admin@karirti.test | Password123! |
-| Perusahaan 1 | hrd@pt-solusi-digital-nusantara.test | Password123! |
+| Perusahaan | hrd@pt-solusi-digital-nusantara.test | Password123! |
 | Pelamar | pelamar0@karirti.test | Password123! |
 
-> **Jangan gunakan akun demo di production!**
+## Pengujian Otomatis (Automated Tests)
 
-## Test
-
-```powershell
-$env:PATH = "M:\Xampp;$env:PATH"
-cd karirti
+```bash
 php artisan test
-# Hasil: 100 tests, 210 assertions
+# Hasil: 113 tests passed, 252 assertions (SQLite & MySQL)
 ```
 
 ## Struktur Utama

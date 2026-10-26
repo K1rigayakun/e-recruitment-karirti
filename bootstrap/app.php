@@ -28,10 +28,8 @@ return Application::configure(basePath: dirname(__DIR__))
             SecurityHeaders::class,
         ]);
 
-        // TrustProxies dari env (untuk deploy di balik load balancer)
-        $middleware->trustProxies(
-            at: env('TRUSTED_PROXIES', ''),
-        );
+        // TrustProxies (untuk deploy di balik reverse proxy / load balancer)
+        $middleware->trustProxies(at: '*');
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

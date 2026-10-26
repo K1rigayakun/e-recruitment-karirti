@@ -37,10 +37,13 @@ class StoreCvRequest extends FormRequest
 
     public function messages(): array
     {
+        $maxKb = (int) config('karirti.cv_max_kb', 2048);
+        $mb = round($maxKb / 1024, 1);
+
         return [
             'cv.mimes' => 'CV harus berformat PDF.',
             'cv.mimetypes' => 'CV harus berformat PDF.',
-            'cv.max' => 'CV tidak boleh lebih dari '.config('karirti.cv_max_kb').' KB (2 MB).',
+            'cv.max' => 'CV tidak boleh lebih dari '.$maxKb.' KB ('.$mb.' MB).',
         ];
     }
 }

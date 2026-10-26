@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Company;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ReportFilterRequest;
 use App\Services\CsvExporter;
 use App\Services\ReportBuilder;
 use Illuminate\Http\Request;
@@ -25,22 +26,26 @@ class ReportController extends Controller
         return view('company.reports.index', compact('funnel', 'topJobs', 'profile'));
     }
 
-    public function export(Request $request): StreamedResponse
+    public function export(ReportFilterRequest $request): StreamedResponse
     {
         $profile = $request->user()->companyProfile;
-        $rows = $this->report->applicantTable($profile->id, $request->only('status', 'from', 'to'))->get();
+        $cursor = $this->report->applicantTable($profile->id, $request->validated())->cursor();
 
-        $data = $rows->map(fn ($app) => [
-            $app->applicantProfile?->user?->name,
-            $app->applicantProfile?->nim,
-            $app->applicantProfile?->graduation_year,
-            $app->jobPosting?->title,
-            $app->status?->label(),
-            $app->created_at?->format('Y-m-d'),
-        ]);
+        $rows = (function () use ($cursor) {
+            foreach ($cursor as $app) {
+                yield [
+                    $app->applicantProfile?->user?->name,
+                    $app->applicantProfile?->nim,
+                    $app->applicantProfile?->graduation_year,
+                    $app->jobPosting?->title,
+                    $app->status?->label(),
+                    $app->created_at?->format('Y-m-d'),
+                ];
+            }
+        })();
 
         return $this->csv->stream('laporan-'.now()->format('Ymd').'.csv', [
             'Nama', 'NIM', 'Tahun Lulus', 'Posisi', 'Status', 'Tanggal Lamar',
-        ], $data);
+        ], $rows);
     }
 }

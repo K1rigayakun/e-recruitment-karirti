@@ -68,7 +68,12 @@ class InterviewScheduler
      */
     public function reschedule(Interview $interview, User $actor, array $data): Interview
     {
+        if (in_array($interview->status, [InterviewStatus::Cancelled, InterviewStatus::Completed], true)) {
+            throw new \DomainException('Interview yang sudah dibatalkan atau selesai tidak dapat dijadwalkan ulang.');
+        }
+
         $this->validateScheduleData($data);
+        $this->assertNoConflict($interview->application, $data['scheduled_at'], $data['duration_minutes'], $interview->id);
 
         return DB::transaction(function () use ($interview, $data): Interview {
             $interview->scheduled_at = $data['scheduled_at'];
@@ -89,6 +94,10 @@ class InterviewScheduler
      */
     public function cancel(Interview $interview, User $actor): Interview
     {
+        if (in_array($interview->status, [InterviewStatus::Cancelled, InterviewStatus::Completed], true)) {
+            throw new \DomainException('Interview sudah tidak aktif.');
+        }
+
         $interview->status = InterviewStatus::Cancelled;
         $interview->save();
 
@@ -102,6 +111,10 @@ class InterviewScheduler
     {
         abort_unless($interview->application->applicantProfile->user_id === $actor->id, 403);
 
+        if (! in_array($interview->status, [InterviewStatus::Scheduled, InterviewStatus::RescheduleRequested], true)) {
+            throw new \DomainException('Hanya interview yang belum dikonfirmasi yang dapat dikonfirmasi.');
+        }
+
         $interview->status = InterviewStatus::Confirmed;
         $interview->save();
 
@@ -114,6 +127,10 @@ class InterviewScheduler
     public function requestReschedule(Interview $interview, User $actor, ?string $note): Interview
     {
         abort_unless($interview->application->applicantProfile->user_id === $actor->id, 403);
+
+        if (! in_array($interview->status, [InterviewStatus::Scheduled, InterviewStatus::Confirmed], true)) {
+            throw new \DomainException('Hanya interview aktif yang dapat diajukan jadwal ulang.');
+        }
 
         $interview->status = InterviewStatus::RescheduleRequested;
         $interview->applicant_note = $note;
@@ -155,7 +172,7 @@ class InterviewScheduler
      *
      * @throws \DomainException
      */
-    private function assertNoConflict(Application $application, Carbon $start, int $duration): void
+    private function assertNoConflict(Application $application, Carbon $start, int $duration, ?int $excludeInterviewId = null): void
     {
         $profileId = $application->applicant_profile_id;
 
@@ -165,6 +182,7 @@ class InterviewScheduler
             'application',
             fn ($q) => $q->where('applicant_profile_id', $profileId)
         )
+            ->when($excludeInterviewId, fn ($q, $id) => $q->where('id', '!=', $id))
             ->whereIn('status', [
                 InterviewStatus::Scheduled->value,
                 InterviewStatus::Confirmed->value,

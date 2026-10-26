@@ -229,13 +229,11 @@
                     <span class="rounded-chip bg-signal/20 px-2 py-0.5 font-mono text-xs text-signal">E09</span>
                     <h3 class="text-sm font-semibold text-paper">Form shake & centang</h3>
                 </div>
-                <form class="flex max-w-sm flex-col gap-3" data-validate-demo
-                    onsubmit="event.preventDefault(); document.getElementById('e09-success').hidden=false; setTimeout(()=>document.getElementById('e09-success').hidden=true, 3000)">
+                <form class="flex max-w-sm flex-col gap-3" data-validate-demo>
                     <x-ui.input name="e09_email" type="email" label="Email" required placeholder="contoh@email.com" />
                     <div class="flex gap-2">
                         <x-ui.button variant="primary" type="submit">Kirim</x-ui.button>
-                        <x-ui.button variant="ghost" type="button"
-                            onclick="document.querySelector('[name=e09_email]').value=''; document.querySelector('[name=e09_email]').dispatchEvent(new Event('invalid'))">
+                        <x-ui.button variant="ghost" type="button" data-try-error>
                             Coba error
                         </x-ui.button>
                     </div>
@@ -369,7 +367,7 @@
                 </div>
                 <div class="flex flex-wrap gap-2">
                     @foreach (['applied', 'viewed', 'interview', 'accepted', 'rejected'] as $s)
-                        <x-ui.button variant="ghost" size="sm" data-replay="#e17-demo > div" onclick="document.querySelector('#e17-demo > div').dataset.status='{{ $s }}'; window.karirti?.replayPipeline?.(document.querySelector('#e17-demo > div'))">{{ ucfirst($s) }}</x-ui.button>
+                        <x-ui.button variant="ghost" size="sm" data-replay="#e17-demo > div" data-set-pipeline-status="{{ $s }}">{{ ucfirst($s) }}</x-ui.button>
                     @endforeach
                 </div>
             </div>
