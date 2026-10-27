@@ -128,4 +128,3 @@ docs/              # ERD, deploy, security, QA, user-guide, demo-script
 | Motion Guide | `docs/motion.md` |
 | User Guide | `docs/user-guide.md` |
 | Demo Script | `docs/demo-script.md` |
-| Progress | `PROGRESS.md` |
